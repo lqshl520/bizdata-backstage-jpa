@@ -10,8 +10,8 @@
 
 logs/*
 
-.mvn/*
-
 target/*
 /target/
 /logs/
+
+bizdata-backstage-jpa.iml
