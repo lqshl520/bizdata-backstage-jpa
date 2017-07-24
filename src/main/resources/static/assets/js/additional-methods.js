@@ -647,9 +647,9 @@ $.validator.addMethod("phoneUK", function(phone_number, element) {
  * 212-999-0983
  *
  * but not
- * 111-123-5434
+ * 111-error-5434
  * and not
- * 212 123 4567
+ * 212 error 4567
  */
 $.validator.addMethod("phoneUS", function(phone_number, element) {
 	phone_number = phone_number.replace(/\s+/g, "");

@@ -3014,7 +3014,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     this.resizeSearch();
                     if (this.getMaximumSelectionSize() > 0 && this.val().length >= this.getMaximumSelectionSize()) {
                         // if we reached max selection size repaint the results so choices
-                        // are replaced with the max selection reached message
+                        // are replaced with the max selection reached i18n
                         this.updateResults(true);
                     } else {
                         // initializes search's value with nextSearchTerm and update search result

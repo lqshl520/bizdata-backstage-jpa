@@ -6657,7 +6657,7 @@ $.fn.jqFilter = function( arg ) {
 			var that = this,  i;
 			// this table will hold all the group (tables) and rules (rows)
 			var table = $("<table class='group ui-widget ui-widget-content' style='border:0px none;'><tbody></tbody></table>"),
-			// create error message row
+			// create error i18n row
 			align = "left";
 			if(this.p.direction === "rtl") {
 				align = "right";

@@ -1070,7 +1070,7 @@ TableTools.prototype = {
 	 *    terminate the print view and return to normal.
 	 *  @param {object} [oConfig={}] Configuration for the print view
 	 *  @param {boolean} [oConfig.bShowAll=false] Show all rows in the table if true
-	 *  @param {string} [oConfig.sInfo] Information message, displayed as an overlay to the
+	 *  @param {string} [oConfig.sInfo] Information i18n, displayed as an overlay to the
 	 *    user to let them know what the print view is.
 	 *  @param {string} [oConfig.sMessage] HTML string to show at the top of the document - will
 	 *    be included in the printed document.
@@ -1094,9 +1094,9 @@ TableTools.prototype = {
 
 
 	/**
-	 * Show a message to the end user which is nicely styled
+	 * Show a i18n to the end user which is nicely styled
 	 *  @param {string} message The HTML string to show to the user
-	 *  @param {int} time The duration the message is to be shown on screen for (mS)
+	 *  @param {int} time The duration the i18n is to be shown on screen for (mS)
 	 */
 	"fnInfo": function ( message, time ) {
 		var info = $('<div/>')
@@ -2437,13 +2437,13 @@ TableTools.prototype = {
 		/* Print class can be used for styling */
 		$(document.body).addClass( this.classes.print.body );
 
-		/* Show information message to let the user know what is happening */
+		/* Show information i18n to let the user know what is happening */
 		if ( oConfig.sInfo !== "" )
 		{
 			this.fnInfo( oConfig.sInfo, 3000 );
 		}
 
-		/* Add a message at the top of the page */
+		/* Add a i18n at the top of the page */
 		if ( oConfig.sMessage )
 		{
 			$('<div/>')
@@ -2498,7 +2498,7 @@ TableTools.prototype = {
 		/* Restore the scroll */
 		window.scrollTo( 0, oSetPrint.saveScroll );
 
-		/* Drop the print message */
+		/* Drop the print i18n */
 		$('div.'+this.classes.print.message).remove();
 
 		/* Styling class */
@@ -2877,7 +2877,7 @@ TableTools.BUTTONS = {
 		"fnClick": function( nButton, oConfig, flash ) {
 			this.fnSetText( flash,
 				"title:"+ this.fnGetTitle(oConfig) +"\n"+
-				"message:"+ oConfig.sPdfMessage +"\n"+
+				"i18n:"+ oConfig.sPdfMessage +"\n"+
 				"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
 				"orientation:"+ oConfig.sPdfOrientation +"\n"+
 				"size:"+ oConfig.sPdfSize +"\n"+

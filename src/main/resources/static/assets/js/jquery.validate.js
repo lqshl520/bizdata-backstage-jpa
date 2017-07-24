@@ -649,15 +649,15 @@ $.extend( $.validator, {
 			return true;
 		},
 
-		// return the custom message for the given element and validation method
+		// return the custom i18n for the given element and validation method
 		// specified in the element's HTML5 data attribute
-		// return the generic message if present and no method specific message is present
+		// return the generic i18n if present and no method specific i18n is present
 		customDataMessage: function( element, method ) {
 			return $( element ).data( "msg" + method.charAt( 0 ).toUpperCase() +
 				method.substring( 1 ).toLowerCase() ) || $( element ).data( "msg" );
 		},
 
-		// return the custom message for the given element name and validation method
+		// return the custom i18n for the given element name and validation method
 		customMessage: function( name, method ) {
 			var m = this.settings.messages[ name ];
 			return m && ( m.constructor === String ? m : m[ method ]);
@@ -680,7 +680,7 @@ $.extend( $.validator, {
 				// title is never undefined, so handle empty string as undefined
 				!this.settings.ignoreTitle && element.title || undefined,
 				$.validator.messages[ method ],
-				"<strong>Warning: No message defined for " + element.name + "</strong>"
+				"<strong>Warning: No i18n defined for " + element.name + "</strong>"
 			);
 		},
 
@@ -754,7 +754,7 @@ $.extend( $.validator, {
 			if ( error.length ) {
 				// refresh error/success class
 				error.removeClass( this.settings.validClass ).addClass( this.settings.errorClass );
-				// replace message on existing label
+				// replace i18n on existing label
 				error.html( message );
 			} else {
 				// create error element
