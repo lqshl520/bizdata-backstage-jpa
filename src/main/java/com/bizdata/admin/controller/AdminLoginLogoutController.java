@@ -22,50 +22,50 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * 系统菜单，登录登出日志展示Controller
- *
- * @version 1.0
+ * 登录登出日志展示Controller
  *
  * @author sdevil507
+ * @version 1.0
  */
 @Controller
 @RequestMapping("/admin/loginlogout")
 public class AdminLoginLogoutController {
-	@Autowired
-	private LoginLogoutService loginLogoutService;
 
-	/**
-	 * 侧边栏打开角色管理路径 返回对应的list.jsp页面 对应在后台资源列表中填入的url
-	 *
-	 * @return ModelAndView
-	 */
-	@RequiresPermissions("sys:loginlogout:view")
-	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView list() {
-		// 跳转到对应登录登出日志url
-		return new ModelAndView("admin_page/login_logout_log/login_logout_log");
-	}
+    @Autowired
+    private LoginLogoutService loginLogoutService;
 
-	/**
-	 * 异步获取登录登出日志列表信息
-	 *
-	 * @param jpaPageSortWhereCondition
-	 * @return String
-	 * @throws JpaFindConditionException
-	 */
-	@RequiresPermissions("sys:loginlogout:view")
-	@RequestMapping(value = "/loginlogoutList", method = RequestMethod.GET)
-	@ResponseBody
-	public String loginlogoutList(JpaPageVO pageVO, JpaSortVO sortVO, JqgridSearchVO jqgridSearchVO)
-			throws JpaFindConditionException {
-		Map<String, Object> sysLoginLogoutMap = new HashMap<String, Object>();
-		Page<Login_Logout> pageInfo = loginLogoutService.findAllByPage(pageVO, sortVO, jqgridSearchVO);
-		sysLoginLogoutMap.put("rows", pageInfo.getContent());
-		sysLoginLogoutMap.put("currentPage", pageVO.getPage());
-		sysLoginLogoutMap.put("totalPageSize", pageInfo.getTotalPages());
-		sysLoginLogoutMap.put("totalRecords", pageInfo.getTotalElements());
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		String json = gson.toJson(sysLoginLogoutMap);
-		return json;
-	}
+    /**
+     * 登录登出日志页面展示
+     *
+     * @return ModelAndView
+     */
+    @RequiresPermissions("sys:loginlogout:view")
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView view() {
+        // 跳转到对应登录登出日志url
+        return new ModelAndView("admin_page/login_logout_log/login_logout_log");
+    }
+
+    /**
+     * 异步获取登录登出日志列表信息
+     *
+     * @param jpaPageSortWhereCondition
+     * @return String
+     * @throws JpaFindConditionException
+     */
+    @RequiresPermissions("sys:loginlogout:view")
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @ResponseBody
+    public String list(JpaPageVO pageVO, JpaSortVO sortVO, JqgridSearchVO jqgridSearchVO)
+            throws JpaFindConditionException {
+        Map<String, Object> sysLoginLogoutMap = new HashMap<>();
+        Page<Login_Logout> pageInfo = loginLogoutService.findAllByPage(pageVO, sortVO, jqgridSearchVO);
+        sysLoginLogoutMap.put("rows", pageInfo.getContent());
+        sysLoginLogoutMap.put("currentPage", pageVO.getPage());
+        sysLoginLogoutMap.put("totalPageSize", pageInfo.getTotalPages());
+        sysLoginLogoutMap.put("totalRecords", pageInfo.getTotalElements());
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String json = gson.toJson(sysLoginLogoutMap);
+        return json;
+    }
 }

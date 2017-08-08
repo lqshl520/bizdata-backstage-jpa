@@ -8,6 +8,7 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,7 +35,7 @@ public class AdminIndexController {
      * @return 视图
      * @throws Exception
      */
-    @RequestMapping("/")
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView index(HttpServletResponse response, String page) throws Exception {
         ModelAndView modelAndView = new ModelAndView();
         if (page == null) {
@@ -57,7 +58,7 @@ public class AdminIndexController {
      *
      * @return 菜单集合数据
      */
-    @RequestMapping(value = "/getCurrentUserMenus")
+    @RequestMapping(value = "/getCurrentUserMenus", method = RequestMethod.GET)
     @ResponseBody
     public ResultVO getAllUserMenus() throws Exception {
         ResultVO resultVO;
