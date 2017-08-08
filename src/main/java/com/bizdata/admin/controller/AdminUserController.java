@@ -12,7 +12,7 @@ import com.bizdata.framework.exception.PageConditionException;
 import com.bizdata.framework.exception.SearchConditionException;
 import com.bizdata.framework.exception.SortConditionException;
 import com.bizdata.framework.extension.log.Loggable;
-import com.bizdata.framework.shiro.realm.UserNameSessionIdMap;
+import com.bizdata.framework.shiro.UserNameSessionIdMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.shiro.SecurityUtils;

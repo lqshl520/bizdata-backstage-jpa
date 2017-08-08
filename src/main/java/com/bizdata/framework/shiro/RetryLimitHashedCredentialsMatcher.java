@@ -1,4 +1,4 @@
-package com.bizdata.framework.shiro.credentials;
+package com.bizdata.framework.shiro;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

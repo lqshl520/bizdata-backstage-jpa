@@ -1,4 +1,4 @@
-package com.bizdata.framework.shiro.realm;
+package com.bizdata.framework.shiro;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;

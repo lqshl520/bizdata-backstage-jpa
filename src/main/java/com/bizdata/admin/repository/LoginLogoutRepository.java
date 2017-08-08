@@ -1,8 +1,8 @@
 package com.bizdata.admin.repository;
 
 import com.bizdata.admin.domain.Login_Logout;
-import com.bizdata.commons.utils.BaseRepository;
+import me.sdevil507.base.JpaBaseRepository;
 
-public interface LoginLogoutRepository extends BaseRepository<Login_Logout, String>{
+public interface LoginLogoutRepository extends JpaBaseRepository<Login_Logout, String> {
 
 }

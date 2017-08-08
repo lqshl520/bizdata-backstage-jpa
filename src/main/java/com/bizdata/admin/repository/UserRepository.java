@@ -1,10 +1,9 @@
 package com.bizdata.admin.repository;
 
+import com.bizdata.admin.domain.User;
+import me.sdevil507.base.JpaBaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import com.bizdata.admin.domain.User;
-import com.bizdata.commons.utils.BaseRepository;
 
 /**
  * 用户Repository
@@ -13,7 +12,7 @@ import com.bizdata.commons.utils.BaseRepository;
  *
  * @author sdevil507
  */
-public interface UserRepository extends BaseRepository<User, String> {
+public interface UserRepository extends JpaBaseRepository<User, String> {
 
 	/**
 	 * 根据用户名查找用户
@@ -22,7 +21,7 @@ public interface UserRepository extends BaseRepository<User, String> {
 	 * @return User
 	 */
 	@Query("from User where username= :username")
-	public User findUserByUsername(@Param("username") String username);
+	User findUserByUsername(@Param("username") String username);
 
 	/**
 	 * 根据组织机构id查询用户个数
@@ -30,6 +29,6 @@ public interface UserRepository extends BaseRepository<User, String> {
 	 * @param organizationId 组织机构id
 	 * @return List<User>
 	 */
-	@Query("select count(1) from User where organizationId=:organizationId") 
-	public int countByOrganizationId(@Param("organizationId") String organizationId);
+	@Query("select count(1) from User where organizationId=:organizationId")
+	int countByOrganizationId(@Param("organizationId") String organizationId);
 }

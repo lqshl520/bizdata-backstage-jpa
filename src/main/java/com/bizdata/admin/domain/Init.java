@@ -1,38 +1,31 @@
 package com.bizdata.admin.domain;
 
-import java.util.Date;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import me.sdevil507.base.JpaUUIDBaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import com.bizdata.commons.utils.BaseEntity;
+import java.util.Date;
 
 /**
  * 数据初始化表
  *
- * @version 1.0
- *
  * @author sdevil507
+ * @version 1.0
  */
 @Entity
 @Table(name = "admin_init")
-public class Init extends BaseEntity {
-	/**
-	 * 是否已经初始化
-	 */
-	@Column(nullable = false)
-	private boolean state = false;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class Init extends JpaUUIDBaseEntity {
+    /**
+     * 是否已经初始化
+     */
+    @Column(nullable = false)
+    private boolean state = false;
 
-	@Column(nullable = false)
-	private Date date = new Date();
-
-	public boolean isState() {
-		return state;
-	}
-
-	public void setState(boolean state) {
-		this.state = state;
-	}
-
+    @Column(nullable = false)
+    private Date date = new Date();
 }

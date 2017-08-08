@@ -1,7 +1,7 @@
 package com.bizdata.admin.repository;
 
 import com.bizdata.admin.domain.Role;
-import com.bizdata.commons.utils.BaseRepository;
+import me.sdevil507.base.JpaBaseRepository;
 
 /**
  * 角色Dao
@@ -10,6 +10,6 @@ import com.bizdata.commons.utils.BaseRepository;
  *
  * @author sdevil507
  */
-public interface RoleRepository extends BaseRepository<Role, String>{
+public interface RoleRepository extends JpaBaseRepository<Role, String> {
 
 }

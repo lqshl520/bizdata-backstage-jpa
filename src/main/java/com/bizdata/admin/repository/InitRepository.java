@@ -1,8 +1,8 @@
 package com.bizdata.admin.repository;
 
 import com.bizdata.admin.domain.Init;
-import com.bizdata.commons.utils.BaseRepository;
+import me.sdevil507.base.JpaBaseRepository;
 
-public interface InitRepository extends BaseRepository<Init, String> {
+public interface InitRepository extends JpaBaseRepository<Init, String> {
 
 }

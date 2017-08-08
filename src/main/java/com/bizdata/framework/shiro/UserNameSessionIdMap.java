@@ -1,4 +1,4 @@
-package com.bizdata.framework.shiro.realm;
+package com.bizdata.framework.shiro;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
