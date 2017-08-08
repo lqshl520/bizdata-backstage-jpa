@@ -122,10 +122,6 @@ public class User extends BaseEntity {
         this.salt = salt;
     }
 
-    public String getCredentialsSalt() {
-        return salt;
-    }
-
     public boolean isLocked() {
         return locked;
     }

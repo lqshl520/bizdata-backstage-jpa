@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
         // 根据用户名找出数据库记录
         User user = userRepository.findUserByUsername(username);
         // 判断旧密码输入是否正确
-        if (passwordHelper.checkPassword(password, user.getPassword(), user.getCredentialsSalt())) {
+        if (passwordHelper.checkPassword(password, user.getPassword(), user.getSalt())) {
             return true;
         } else {
             return false;

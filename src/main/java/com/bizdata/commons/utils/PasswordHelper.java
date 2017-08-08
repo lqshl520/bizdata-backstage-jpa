@@ -57,7 +57,7 @@ public class PasswordHelper {
 
 		// 加密密码，对应参数解释：0:md5算法，1:需要散列的对象，2:盐值(User对象里采用username+slat)，3:算法迭代次数，这里是两次
 		// 此处相当于md5(md5(password+自定义slat))
-		String mySalt = user.getCredentialsSalt();
+		String mySalt = user.getSalt();
 		String newPassword = new SimpleHash(algorithmName, user.getPassword(), ByteSource.Util.bytes(mySalt),
 				hashIterations).toHex();
 		
