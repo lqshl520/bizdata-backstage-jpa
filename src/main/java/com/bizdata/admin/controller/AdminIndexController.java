@@ -60,7 +60,7 @@ public class AdminIndexController {
      */
     @RequestMapping(value = "/getCurrentUserMenus", method = RequestMethod.GET)
     @ResponseBody
-    public ResultVO getAllUserMenus() throws Exception {
+    public ResultVO getCurrentUserMenus() {
         ResultVO resultVO;
         String username = SecurityUtils.getSubject().getPrincipal().toString();
         List<Resource> menus = menuService.getAuthMenus(username);
