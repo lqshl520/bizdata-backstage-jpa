@@ -67,7 +67,7 @@ public interface OrganizationService {
 	 * @param parent_id 组织机构id
 	 * @return int
 	 */
-	public int CountByParentId(String parent_id);
+	public int countByParentId(String parent_id);
 
 	/**
 	 * 根据父id找到孩子们

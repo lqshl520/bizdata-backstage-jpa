@@ -140,7 +140,7 @@ public class AdminOrganizationController {
 			if (orgList != null) {
 				for (Organization org : orgList) {
 					Map<String, Object> map = new HashMap<String, Object>();
-					int count = organizationService.CountByParentId(org.getId());
+					int count = organizationService.countByParentId(org.getId());
 					if (count > 0) {
 						map.put("type", "folder");
 					} else {
