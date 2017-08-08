@@ -389,19 +389,19 @@ the specific language governing permissions and limitations under the Apache Lic
      *
      * @param options object containing configuration parameters
      * @param options.params parameter map for the transport ajax call, can contain such options as cache, jsonpCallback, etc. see $.ajax
-     * @param options.transport function that will be used to execute the ajax request. must be compatible with parameters supported by $.ajax
+     * @param options.transport function that will be used to execute the ajax resp. must be compatible with parameters supported by $.ajax
      * @param options.url url for the data
      * @param options.data a function(searchTerm, pageNumber, context) that should return an object containing query string parameters for the above url.
-     * @param options.dataType request data type: ajax, jsonp, other datatypes supported by jQuery's $.ajax function or the transport function if specified
+     * @param options.dataType resp data type: ajax, jsonp, other datatypes supported by jQuery's $.ajax function or the transport function if specified
      * @param options.quietMillis (optional) milliseconds to wait before making the ajaxRequest, helps debounce the ajax function if invoked too often
-     * @param options.results a function(remoteData, pageNumber, query) that converts data returned form the remote request to the format expected by Select2.
+     * @param options.results a function(remoteData, pageNumber, query) that converts data returned form the remote resp to the format expected by Select2.
      *      The expected format is an object containing the following keys:
      *      results array of objects that will be used as choices
      *      more (optional) boolean indicating whether there are more results available
      *      Example: {results:[{id:1, text:'Red'},{id:2, text:'Blue'}], more:true}
      */
     function ajax(options) {
-        var timeout, // current scheduled but not yet executed request
+        var timeout, // current scheduled but not yet executed resp
             handler = null,
             quietMillis = options.quietMillis || 100,
             ajaxUrl = options.url,
@@ -415,7 +415,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     transport = options.transport || $.fn.select2.ajaxDefaults.transport,
                     // deprecated - to be removed in 4.0  - use params instead
                     deprecated = {
-                        type: options.type || 'GET', // set type of request (GET or POST)
+                        type: options.type || 'GET', // set type of resp (GET or POST)
                         cache: options.cache || false,
                         jsonpCallback: options.jsonpCallback||undefined,
                         dataType: options.dataType||"json"
