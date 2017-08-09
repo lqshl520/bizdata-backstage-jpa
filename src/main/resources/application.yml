@@ -4,7 +4,11 @@ server: #server config
 spring:
   main: #spring boot config
     banner-mode: "off" #关闭banner
-    
+
+  jackson:
+    dateFormat: yyyy-MM-dd HH:mm:ss
+    timeZone: GMT+8
+
   datasource: #data source config
     url: jdbc:mysql://127.0.0.1:3306/gjf?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
