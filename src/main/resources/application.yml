@@ -31,3 +31,15 @@ spring:
     encoding: UTF-8
     content-type: text/html
     cache: false
+
+shiro:
+  password: #控制密码相关配置
+    retryCount: 5 #密码最多输入错误数
+
+  kickout: #控制同一账号同时登陆人数
+    maxSession: 1 #同时登陆最大人数
+    kickoutAfter: false #踢出方式(false:踢出第一个登陆,true:最后个无法登陆)
+
+  cookie: #控制cookie相关配置
+    maxAge: -1 #过期时间(-1:永不过期,单位:秒)
+    rememberMeMaxAge: 2592000 #记住我cookie过期时间(默认30天,单位为"秒")

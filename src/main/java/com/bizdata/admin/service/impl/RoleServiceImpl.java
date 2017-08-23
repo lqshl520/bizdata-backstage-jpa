@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.bizdata.admin.domain.RoleResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bizdata.admin.domain.Resource;
 import com.bizdata.admin.domain.Role;
-import com.bizdata.admin.domain.Role_Resource;
 import com.bizdata.admin.repository.ResourceRepository;
 import com.bizdata.admin.repository.RoleRepository;
 import com.bizdata.admin.repository.RoleResourceRepository;
@@ -93,13 +93,13 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public void addRelation(Role_Resource roleResource) {
+	public void addRelation(RoleResource roleResource) {
 		roleResourceRepository.save(roleResource);
 	}
 
 	@Transactional
 	@Override
-	public void disassociate(Role_Resource roleResource) throws RoleException {
+	public void disassociate(RoleResource roleResource) throws RoleException {
 		// 判断是否是删除超级管理员角色的系统功能关系，若是则不能删除
 		if (roleResource.getRoleid().equals("1")) {
 			Resource res = resourceRepository.findOne(roleResource.getResourceid());
@@ -107,7 +107,7 @@ public class RoleServiceImpl implements RoleService {
 				throw new RoleException("超级管理员角色与初始化的系统资源关联关系不可以解除。");
 			}
 		}
-		Role_Resource result_role_resource = roleResourceRepository.findByRoleidAndResourceid(roleResource.getRoleid(),
+		RoleResource result_role_resource = roleResourceRepository.findByRoleidAndResourceid(roleResource.getRoleid(),
 				roleResource.getResourceid());
 		roleResourceRepository.delete(result_role_resource);
 	}

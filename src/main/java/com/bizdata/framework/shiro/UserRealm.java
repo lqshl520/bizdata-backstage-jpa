@@ -1,5 +1,6 @@
 package com.bizdata.framework.shiro;
 
+import com.bizdata.framework.shiro.utils.UserNameSessionIDsMapOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.bizdata.admin.domain.User;
 import com.bizdata.admin.service.UserService;
 
+import java.io.Serializable;
+import java.util.Deque;
+
 /**
  * 用户认证授权相关，类似dataSource，负责用户账户验证，获取所持有的角色<br>
  * 继承AuthorizingRealm（授权），其继承了AuthenticatingRealm即身份验证），<br>
@@ -29,6 +33,9 @@ public class UserRealm extends AuthorizingRealm {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
     /**
      * 返回对应用户所拥有的验证信息
@@ -69,8 +76,8 @@ public class UserRealm extends AuthorizingRealm {
             throw new UnknownAccountException();// 没找到帐号
         }
 
-        // 0:为未锁定，1:为锁定！如果为1，则返回账号锁定
-        if (true == user.isLocked()) {
+        // true:锁定,false:可用,则返回账号锁定
+        if (user.isLocked()) {
             throw new LockedAccountException(); // 帐号锁定
         }
 
@@ -83,7 +90,9 @@ public class UserRealm extends AuthorizingRealm {
         );
 
         // 验证成功,设置用户名与session_id的映射
-        UserNameSessionIdMap.put(user.getUsername(), SecurityUtils.getSubject().getSession().getId().toString());
+        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(user.getUsername());
+        userNameSessionIDsMapOperation.add(deque, SecurityUtils.getSubject().getSession().getId().toString());
+        userNameSessionIDsMapOperation.cacheNotify(user.getUsername(), deque);
         // 如果身份认证验证成功，返回一个AuthenticationInfo实现；
         return authenticationInfo;
     }

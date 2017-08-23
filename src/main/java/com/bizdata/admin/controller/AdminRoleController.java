@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bizdata.admin.domain.RoleResource;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.bizdata.admin.domain.Role;
-import com.bizdata.admin.domain.Role_Resource;
 import com.bizdata.admin.service.RoleService;
 import com.bizdata.commons.constant.BizdataResponseStatus;
 import com.bizdata.commons.utils.GsonExclusionStrategy;
@@ -148,7 +148,7 @@ public class AdminRoleController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/relation/role/{roleid}/resource/{resourceid}", method = RequestMethod.POST)
-	public String addRelation(Role_Resource roleResource) {
+	public String addRelation(RoleResource roleResource) {
 		String json = "";
 		try {
 			roleService.addRelation(roleResource);
@@ -169,7 +169,7 @@ public class AdminRoleController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/disassociate/role/{roleid}/resource/{resourceid}", method = RequestMethod.POST)
-	public String disassociate(Role_Resource roleResource) {
+	public String disassociate(RoleResource roleResource) {
 		String json = "";
 		if (roleResource.getRoleid() == null || roleResource.getResourceid() == null) {
 			json = BizdataResponseStatus.COMMON_ERROR.getResult("参数异常，请重试");

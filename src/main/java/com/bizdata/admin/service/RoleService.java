@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.bizdata.admin.domain.Role;
-import com.bizdata.admin.domain.Role_Resource;
+import com.bizdata.admin.domain.RoleResource;
 import com.bizdata.framework.exception.RoleException;
 
 /**
@@ -70,7 +70,7 @@ public interface RoleService {
 	 *
 	 * @param roleResource roleResource实体
 	 */
-	public void addRelation(Role_Resource roleResource);
+	public void addRelation(RoleResource roleResource);
 
 	/**
 	 * 在角色资源关系表中，删除一条关系记录
@@ -78,6 +78,6 @@ public interface RoleService {
 	 * @param roleResource roleResource实体
 	 * @throws RoleException
 	 */
-	public void disassociate(Role_Resource roleResource)
+	public void disassociate(RoleResource roleResource)
 			throws RoleException;
 }

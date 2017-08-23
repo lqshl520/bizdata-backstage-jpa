@@ -24,7 +24,7 @@ import com.bizdata.admin.service.UserService;
 import com.bizdata.commons.utils.JpaPageVO;
 import com.bizdata.commons.utils.JpaSortVO;
 import com.bizdata.commons.utils.JqgridSearchVO;
-import com.bizdata.commons.utils.PasswordHelper;
+import com.bizdata.framework.shiro.PasswordHelper;
 import com.bizdata.framework.exception.JpaFindConditionException;
 
 @Service

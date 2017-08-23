@@ -1,35 +1,30 @@
 package com.bizdata.admin.service;
 
+import com.bizdata.admin.domain.LoginLogout;
+import me.sdevil507.vo.JpaPageParamVO;
+import me.sdevil507.vo.JpaSortParamVO;
 import org.springframework.data.domain.Page;
-
-import com.bizdata.admin.domain.Login_Logout;
-import com.bizdata.commons.utils.JpaPageVO;
-import com.bizdata.commons.utils.JpaSortVO;
-import com.bizdata.commons.utils.JqgridSearchVO;
-import com.bizdata.framework.exception.JpaFindConditionException;
 
 /**
  * 执行登录登出操作日志
  *
- * @version 1.0
- *
  * @author sdevil507
+ * @version 1.0
  */
 public interface LoginLogoutService {
 
-	/**
-	 * 执行日志记录
-	 *
-	 * @param loginLogout
-	 *            日志对象
-	 */
-	public void log(Login_Logout loginLogout);
+    /**
+     * 执行日志记录
+     *
+     * @param loginLogout 日志对象
+     */
+    void log(LoginLogout loginLogout);
 
-	/**
-	 * 分页查询日志
-	 *
-	 * @return List<Login_Logout>
-	 */
-	public Page<Login_Logout> findAllByPage(JpaPageVO pageVO, JpaSortVO sortVO, JqgridSearchVO jqgridSearchVO)
-			throws JpaFindConditionException;
+    /**
+     * 分页查询登录登出日志
+     *
+     * @return 登录退出分页日志集合
+     * @see Page<LoginLogout>
+     */
+    Page<LoginLogout> findAllByPage(JpaPageParamVO jpaPageParamVO, JpaSortParamVO jpaSortParamVO);
 }

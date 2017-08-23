@@ -1,25 +1,22 @@
 package com.bizdata.admin.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.bizdata.admin.domain.LoginLogout;
+import com.bizdata.admin.service.LoginLogoutService;
+import com.bizdata.commons.utils.*;
+import com.bizdata.framework.exception.JpaFindConditionException;
+import me.sdevil507.resp.ResultVO;
+import me.sdevil507.vo.JpaPageParamVO;
+import me.sdevil507.vo.JpaPageResultVO;
+import me.sdevil507.vo.JpaSortParamVO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.bizdata.admin.domain.Login_Logout;
-import com.bizdata.admin.service.LoginLogoutService;
-import com.bizdata.commons.utils.JpaPageVO;
-import com.bizdata.commons.utils.JpaSortVO;
-import com.bizdata.commons.utils.JqgridSearchVO;
-import com.bizdata.framework.exception.JpaFindConditionException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * 登录登出日志展示Controller
@@ -34,6 +31,12 @@ public class AdminLoginLogoutController {
     @Autowired
     private LoginLogoutService loginLogoutService;
 
+    @Autowired
+    private JqGridSortVO2JpaSortParamVO jqGridSortVO2JpaSortParamVO;
+
+    @Autowired
+    private JqGridPageVO2JpaPageParamVO jqGridPageVO2JpaPageParamVO;
+
     /**
      * 登录登出日志页面展示
      *
@@ -47,25 +50,20 @@ public class AdminLoginLogoutController {
     }
 
     /**
-     * 异步获取登录登出日志列表信息
+     * 获取登录退出日志列表
      *
-     * @param jpaPageSortWhereCondition
-     * @return String
-     * @throws JpaFindConditionException
+     * @param jqGridPageVO jqGrid分页VO
+     * @param jqGridSortVO jqGrid排序VO
+     * @return 登录退出日志列表
      */
     @RequiresPermissions("sys:loginlogout:view")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
-    public String list(JpaPageVO pageVO, JpaSortVO sortVO, JqgridSearchVO jqgridSearchVO)
-            throws JpaFindConditionException {
-        Map<String, Object> sysLoginLogoutMap = new HashMap<>();
-        Page<Login_Logout> pageInfo = loginLogoutService.findAllByPage(pageVO, sortVO, jqgridSearchVO);
-        sysLoginLogoutMap.put("rows", pageInfo.getContent());
-        sysLoginLogoutMap.put("currentPage", pageVO.getPage());
-        sysLoginLogoutMap.put("totalPageSize", pageInfo.getTotalPages());
-        sysLoginLogoutMap.put("totalRecords", pageInfo.getTotalElements());
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-        String json = gson.toJson(sysLoginLogoutMap);
-        return json;
+    public JpaPageResultVO list(JqGridPageVO jqGridPageVO, JqGridSortVO jqGridSortVO) {
+        JpaPageParamVO jpaPageParamVO = jqGridPageVO2JpaPageParamVO.convert(jqGridPageVO);
+        JpaSortParamVO jpaSortParamVO = jqGridSortVO2JpaSortParamVO.convert(jqGridSortVO);
+        Page<LoginLogout> loginLogouts = loginLogoutService.findAllByPage(jpaPageParamVO, jpaSortParamVO);
+        JpaPageResultVO<LoginLogout, LoginLogout> jpaPageResultVO = new JpaPageResultVO<>(loginLogouts, LoginLogout.class);
+        return jpaPageResultVO;
     }
 }

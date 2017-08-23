@@ -18,7 +18,7 @@ import java.util.Date;
 @Table(name = "admin_login_logout")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Login_Logout extends JpaUUIDBaseEntity {
+public class LoginLogout extends JpaUUIDBaseEntity {
     /**
      * 用户名
      */

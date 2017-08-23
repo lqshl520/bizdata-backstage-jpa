@@ -3,11 +3,12 @@ package com.bizdata.framework.listener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.bizdata.admin.domain.LoginLogout;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.bizdata.admin.domain.Login_Logout;
 import com.bizdata.admin.service.LoginLogoutService;
 import com.bizdata.commons.constant.LoginLogoutType;
 
@@ -56,7 +57,7 @@ public class UserSessionListener extends SessionListenerAdapter {
 		String content = username + " 于 " + dateString + " session超时退出系统 ";
 
 		// 封装对象
-		Login_Logout sysLoginLogout = new Login_Logout();
+		LoginLogout sysLoginLogout = new LoginLogout();
 		sysLoginLogout.setUsername(username);
 		sysLoginLogout.setContent(content);
 		sysLoginLogout.setDate(date);

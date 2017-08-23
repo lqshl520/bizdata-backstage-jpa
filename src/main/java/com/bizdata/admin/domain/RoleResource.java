@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Table(name = "admin_role_resource")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Role_Resource extends JpaUUIDBaseEntity {
+public class RoleResource extends JpaUUIDBaseEntity {
     @Column(nullable = false)
     private String roleid;
 

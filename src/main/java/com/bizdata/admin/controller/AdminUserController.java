@@ -12,7 +12,7 @@ import com.bizdata.framework.exception.PageConditionException;
 import com.bizdata.framework.exception.SearchConditionException;
 import com.bizdata.framework.exception.SortConditionException;
 import com.bizdata.framework.extension.log.Loggable;
-import com.bizdata.framework.shiro.UserNameSessionIdMap;
+import com.bizdata.framework.shiro.utils.UserNameSessionIDsMapOperation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.shiro.SecurityUtils;
@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.Serializable;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,11 +48,14 @@ public class AdminUserController {
     @Autowired
     private UserService userService;
 
-    @Autowired(required = true)
+    @Autowired
     private SessionManager sessionManager;
 
     @Loggable
     private Logger logger;
+
+    @Autowired
+    private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
     /**
      * 用户信息展示
@@ -77,7 +82,7 @@ public class AdminUserController {
     @ResponseBody
     public String read(JpaPageVO pageVO, JpaSortVO sortVO, JqgridSearchVO jqgridSearchVO)
             throws JpaFindConditionException {
-        Map<String, Object> userMap = new HashMap<String, Object>();
+        Map<String, Object> userMap = new HashMap<>();
         Page<User> pageInfo = userService.findAllByPage(pageVO, sortVO, jqgridSearchVO);
         userMap.put("rows", pageInfo.getContent());
         userMap.put("currentPage", pageVO.getPage());
@@ -99,7 +104,7 @@ public class AdminUserController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public String create(User user, String[] roles) {
-        String json = "";
+        String json;
         if (!StringUtils.hasText(user.getUsername()) || !StringUtils.hasText(user.getPassword())) {
             json = BizdataResponseStatus.COMMON_ERROR.getResult("用户信息不完整，请确认后重新提交");
             return json;
@@ -125,23 +130,25 @@ public class AdminUserController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public String update(User user, String[] roles) {
-        String json = "";
+        String json;
         if (!StringUtils.hasText(user.getUsername()) || !StringUtils.hasText(user.getPassword())) {
             json = BizdataResponseStatus.COMMON_ERROR.getResult("用户信息不完整，请确认后重新提交");
             return json;
         }
 
-        // 如果被修改的用户是登录着的用户,而且状态设置为禁用,则踢除该用户
-        String kickoutSessionId = UserNameSessionIdMap.get(user.getUsername());
-        if (null != kickoutSessionId && user.isLocked()) {
-            try {
-                Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
-                if (kickoutSession != null) {
-                    // 设置会话的kickout属性表示踢出了
-                    kickoutSession.setAttribute("kickout", true);
+        // 如果被修改的用户是登录着的用户,而且状态设置为禁用,则踢除使用该账号的所有用户
+        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(user.getUsername());
+        for (Serializable sessionID : deque) {
+            if (user.isLocked()) {
+                try {
+                    Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(sessionID));
+                    if (kickoutSession != null) {
+                        // 设置会话的kickout属性表示踢出了
+                        kickoutSession.setAttribute("kickout", true);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
 
@@ -165,7 +172,7 @@ public class AdminUserController {
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
     public String delete(String id) {
-        String json = "";
+        String json;
         if (id.equals("1")) {
             json = BizdataResponseStatus.COMMON_ERROR.getResult("admin为系统超级管理员，初始数据不可以删除！");
             return json;
@@ -190,11 +197,7 @@ public class AdminUserController {
     @ResponseBody
     public boolean checkPassword(String old_password) {
         // 如果密码验证正确
-        if (userService.checkPassword(SecurityUtils.getSubject().getPrincipal().toString(), old_password)) {
-            return true;
-        } else {
-            return false;
-        }
+        return userService.checkPassword(SecurityUtils.getSubject().getPrincipal().toString(), old_password);
     }
 
     /**

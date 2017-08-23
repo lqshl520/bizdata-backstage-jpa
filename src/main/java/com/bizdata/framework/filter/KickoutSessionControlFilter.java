@@ -1,31 +1,32 @@
 
 package com.bizdata.framework.filter;
 
-import java.io.Serializable;
-import java.util.Deque;
-import java.util.LinkedList;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
+import com.bizdata.framework.shiro.utils.UserNameSessionIDsMapOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.util.WebUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import java.io.Serializable;
+import java.util.Deque;
 
 /**
- * 控制同一账户登录用户数控制与处理
+ * 同一账号同时使用人数控制与处理
  *
  * @author sdevil507
  * @version 1.0
  */
 @Slf4j
 public class KickoutSessionControlFilter extends AccessControlFilter {
+
+    @Autowired
+    private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
     /**
      * 踢出后到的地址
@@ -42,7 +43,6 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
     private int maxSession = 1;
 
     private SessionManager sessionManager;
-    private Cache<String, Deque<Serializable>> cache;
 
     public void setKickoutUrl(String kickoutUrl) {
         this.kickoutUrl = kickoutUrl;
@@ -60,10 +60,6 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         this.sessionManager = sessionManager;
     }
 
-    public void setCacheManager(CacheManager cacheManager) {
-        this.cache = cacheManager.getCache("shiro-kickout-session");
-    }
-
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue)
             throws Exception {
@@ -79,36 +75,25 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         }
 
         Session session = subject.getSession();
-        String username = (String) subject.getPrincipal();
-        Serializable sessionId = session.getId();
+        String username = subject.getPrincipal().toString();
+        String sessionId = session.getId().toString();
 
-        // 同步控制
-        Deque<Serializable> deque = cache.get(username);
-        if (deque == null) {
-            deque = new LinkedList<Serializable>();
-            cache.put(username, deque);
-        }
+        // 获取session列表队列
+        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(username);
 
         // 如果队列里没有此sessionId，且用户没有被踢出；放入队列
         if (!deque.contains(sessionId) && session.getAttribute("kickout") == null) {
-            deque.push(sessionId);
+            userNameSessionIDsMapOperation.add(deque, sessionId);
         }
 
         // 如果队列里的sessionId数超出最大会话数，开始踢人
         while (deque.size() > maxSession) {
-            Serializable kickoutSessionId = null;
+            Serializable kickoutSessionId;
             if (kickoutAfter) { // 如果踢出后者
                 kickoutSessionId = deque.removeFirst();
             } else { // 否则踢出前者
                 kickoutSessionId = deque.removeLast();
             }
-            //----------------------------------------------------------------
-            //2016-12-6 sdevil507 add
-            //踢出后,需改变对象！才能使得ehcache缓存同步,通知集群其余服务器更新
-            LinkedList<Serializable> result_deque = new LinkedList<>();
-            result_deque.addAll(deque);
-            cache.put(username, result_deque);
-            //----------------------------------------------------------------
             try {
                 Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
                 if (kickoutSession != null) {
@@ -124,6 +109,8 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         if (session.getAttribute("kickout") != null) {
             // 会话被踢出了
             try {
+                userNameSessionIDsMapOperation.remove(deque, sessionId);
+                userNameSessionIDsMapOperation.cacheNotify(username, deque);
                 subject.logout();
             } catch (Exception e) { // ignore
             }
@@ -131,7 +118,6 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
             WebUtils.issueRedirect(request, response, kickoutUrl);
             return false;
         }
-
         return true;
     }
 }

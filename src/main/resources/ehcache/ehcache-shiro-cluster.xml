@@ -41,7 +41,7 @@
 			class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory" />
 	</cache>
 
-	<cache name="shiro-kickout-session" maxEntriesLocalHeap="2000"
+	<cache name="shiro-currentUserSessionsMapCache" maxEntriesLocalHeap="2000"
 		eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="0"
 		overflowToDisk="false" statistics="true">
 		<!-- 监听RMI同步缓存对象配置 注册相应的的缓存监听类，用于处理缓存事件，如put,remove,update,和expire -->
