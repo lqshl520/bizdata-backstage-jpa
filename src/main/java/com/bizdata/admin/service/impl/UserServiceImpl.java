@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             return Collections.emptySet();
         }
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         for (Role role : user.getRoleList()) {
             roles.add(role.getRole());
         }
