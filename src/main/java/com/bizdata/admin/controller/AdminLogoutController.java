@@ -3,7 +3,9 @@ package com.bizdata.admin.controller;
 import com.bizdata.commons.constant.LoginLogoutType;
 import com.bizdata.commons.utils.LogInOrOutManager;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,19 +38,18 @@ public class AdminLogoutController {
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Subject subject = SecurityUtils.getSubject();
         if (null != subject.getPrincipal()) {
-            // 获取注销前sessionId
-            String sessionID = (String) subject.getSession().getId();
+            // 获取注销前session
+            Session session = subject.getSession();
             // 获取注销前用户名
             String username = subject.getPrincipal().toString();
-            // 获取请求ip
-            String ip = request.getRemoteAddr();
             // 执行入库操作
-            logInOrOutManager.log(LoginLogoutType.LOGOUT, username, ip);
+            logInOrOutManager.log(LoginLogoutType.LOGOUT, username, session.getHost());
             if (subject.isAuthenticated() || subject.isRemembered()) {
-                subject.logout();// session会销毁，在SessionListener监听session销毁，清理权限缓存
+                //如果是登录状态,执行安全退出
+                subject.logout();
             }
         }
         // 执行跳转到登陆页
-        response.sendRedirect(request.getContextPath() + "/admin/login");
+        WebUtils.issueRedirect(request, response, "/admin/login");
     }
 }

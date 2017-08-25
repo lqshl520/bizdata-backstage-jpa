@@ -42,9 +42,6 @@ public class LogInOrOutManagerImpl implements LogInOrOutManager {
             case LOGOUT:
                 content = username + " 于 " + dateString + " 安全退出系统 ";
                 break;
-            case TIME_OUT:
-                content = username + " 于 " + dateString + " session超时退出系统 ";
-                break;
         }
         // 封装对象
         LoginLogout sysLoginLogout = new LoginLogout();

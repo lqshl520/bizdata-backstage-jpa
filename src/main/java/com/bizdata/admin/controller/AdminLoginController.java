@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -48,7 +47,7 @@ public class AdminLoginController {
      * @return ModelAndView
      */
     @RequestMapping(value = "/login")
-    public ModelAndView showLoginForm() {
+    public ModelAndView showLoginViews() {
         return new ModelAndView("login");
     }
 
@@ -70,7 +69,7 @@ public class AdminLoginController {
             // 更新最后登录时间
             updateLastLoginTime();
             // 执行登录日志的记录
-            saveLog(request);
+            saveLog();
         } catch (Exception e) {
             String message = e.getClass().getSimpleName();
             String result = "";
@@ -104,10 +103,8 @@ public class AdminLoginController {
 
     /**
      * 记录登录日志，并且入库
-     *
-     * @param request 请求
      */
-    private void saveLog(ServletRequest request) {
+    private void saveLog() {
         // 获取当前用户对象
         Subject currentUser = SecurityUtils.getSubject();
         // 对象session
@@ -118,12 +115,9 @@ public class AdminLoginController {
         boolean remembered = currentUser.isRemembered();
         // 如果认证通过，并且session没有值，则进行记录,作为新增用户。
         // 如果认证通过，session有值，则不记录，说明已经登录过的。
-        if ((authenticated || remembered) && null == session.getAttribute("authenticated")) {
-            session.setAttribute("authenticated", "true");// session记录是否认证
+        if ((authenticated || remembered)) {
             String username = currentUser.getPrincipal().toString();// 用户名
-            String ip = request.getRemoteAddr();// ip
-            session.setAttribute("username", username);// session记录username，方便后面超时时进行日志写入
-            session.setAttribute("ip", ip);// session记录ip，方便后面超时时进行日志写入
+            String ip = session.getHost();// ip
             logInOrOutManager.log(LoginLogoutType.LOGIN, username, ip);
         } else {
             // 不进行任何操作
