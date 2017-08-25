@@ -2,11 +2,14 @@ package com.bizdata.config;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.bizdata.framework.filter.KickoutSessionControlFilter;
+import com.bizdata.framework.listener.UserSessionListener;
 import com.bizdata.framework.shiro.RetryLimitHashedCredentialsMatcher;
 import com.bizdata.framework.shiro.UserRealm;
 import com.bizdata.framework.shiro.config.ShiroConfigProperties;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -22,11 +25,10 @@ import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 
 import javax.servlet.Filter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * shiro权限框架配置
@@ -153,8 +155,7 @@ public class ShiroConfiguration {
     public DefaultWebSessionManager getDefaultWebSessionManager() {
         DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
         // 设置全局过期时间
-//        defaultWebSessionManager.setGlobalSessionTimeout(60 * 30 * 1000);
-        defaultWebSessionManager.setGlobalSessionTimeout(10 * 1000);
+        defaultWebSessionManager.setGlobalSessionTimeout(shiroConfigProperties().getSession().getTimeOut()*1000);
         // 会话过期删除会话
         defaultWebSessionManager.setDeleteInvalidSessions(true);
         // 设置sessionDao(可以选择具体session存储方式)
@@ -165,6 +166,10 @@ public class ShiroConfiguration {
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
         // 设置cookie相关配置
         defaultWebSessionManager.setSessionIdCookie(getSessionIdSimpleCookie());
+        // session监听器链
+        List<SessionListener> listeners = new ArrayList<>();
+        listeners.add(getUserSessionListener());
+        defaultWebSessionManager.setSessionListeners(listeners);
         return defaultWebSessionManager;
     }
 
@@ -327,5 +332,15 @@ public class ShiroConfiguration {
     @Bean(name = "shiroDialect")
     public ShiroDialect shiroDialect() {
         return new ShiroDialect();
+    }
+
+    /**
+     * 拓展shiro,用于监听session事件
+     *
+     * @return UserSessionListener
+     */
+    @Bean
+    public UserSessionListener getUserSessionListener() {
+        return new UserSessionListener();
     }
 }

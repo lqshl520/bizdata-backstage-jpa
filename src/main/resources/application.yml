@@ -43,3 +43,6 @@ shiro:
   cookie: #控制cookie相关配置
     maxAge: -1 #过期时间(-1:永不过期,单位:秒)
     rememberMeMaxAge: 2592000 #记住我cookie过期时间(默认30天,单位为"秒")
+
+  session: #控制session相关配置
+    timeOut: 10 #过期时间(单位:秒)

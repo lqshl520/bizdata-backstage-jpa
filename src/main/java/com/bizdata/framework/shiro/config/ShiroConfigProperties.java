@@ -28,4 +28,9 @@ public class ShiroConfigProperties {
      * 控制cookie相关配置
      */
     private CookieProperties cookie;
+
+    /**
+     * 控制session相关配置
+     */
+    private SessionProperties session;
 }

@@ -118,6 +118,7 @@ public class AdminLoginController {
         if ((authenticated || remembered)) {
             String username = currentUser.getPrincipal().toString();// 用户名
             String ip = session.getHost();// ip
+            session.setAttribute("username", username);
             logInOrOutManager.log(LoginLogoutType.LOGIN, username, ip);
         } else {
             // 不进行任何操作
