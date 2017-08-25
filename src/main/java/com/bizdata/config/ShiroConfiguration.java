@@ -92,6 +92,21 @@ public class ShiroConfiguration {
         return defaultWebSecurityManager;
     }
 
+//    /**
+//     *多个realm验证处理器,使用setAuthenticator()方法注入到SecurityManager中
+//     *
+//     * @return 多个realm验证处理器
+//     */
+//    @Bean(name = "modularRealmAuthenticator")
+//    public ModularRealmAuthenticator getModularRealmAuthenticator(){
+//        // 多个realm验证处理器
+//        ModularRealmAuthenticator modularRealmAuthenticator=new ModularRealmAuthenticator();
+//        // 此处设置多个realm通过规则,比如全部成功通过,至少一个成功通过等...
+//        AllSuccessfulStrategy  allSuccessfulStrategy=new AllSuccessfulStrategy();
+//        modularRealmAuthenticator.setAuthenticationStrategy(allSuccessfulStrategy);
+//        return modularRealmAuthenticator;
+//    }
+
     // ======================================域配置======================================
 
     /**

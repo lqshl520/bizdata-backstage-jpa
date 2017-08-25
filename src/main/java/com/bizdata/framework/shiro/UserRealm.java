@@ -115,11 +115,11 @@ public class UserRealm extends AuthorizingRealm {
         super.clearCache(principals);
     }
 
-    public void clearAllCachedAuthorizationInfo() {
+    private void clearAllCachedAuthorizationInfo() {
         getAuthorizationCache().clear();
     }
 
-    public void clearAllCachedAuthenticationInfo() {
+    private void clearAllCachedAuthenticationInfo() {
         getAuthenticationCache().clear();
     }
 
@@ -131,7 +131,7 @@ public class UserRealm extends AuthorizingRealm {
     @Override
     public void onLogout(PrincipalCollection principals) {
         //在退出之前回调执行一次清理
-        clearCache(principals);
+        clearCurrentSessionCache(principals);
         super.onLogout(principals);
     }
 
