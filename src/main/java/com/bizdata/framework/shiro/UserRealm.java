@@ -128,4 +128,25 @@ public class UserRealm extends AuthorizingRealm {
         clearAllCachedAuthorizationInfo();
     }
 
+    @Override
+    public void onLogout(PrincipalCollection principals) {
+        //在退出之前回调执行一次清理
+        clearCache(principals);
+        super.onLogout(principals);
+    }
+
+    /**
+     * 退出时清除该用户在映射中的sessionID
+     *
+     * @param principals 身份标识集合
+     */
+    private void clearCurrentSessionCache(PrincipalCollection principals) {
+        // 获取当前sessionID
+        String sessionID = SecurityUtils.getSubject().getSession().getId().toString();
+        // 主身份标识
+        String principal = principals.getPrimaryPrincipal().toString();
+        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(principal);
+        userNameSessionIDsMapOperation.remove(deque, sessionID);
+        userNameSessionIDsMapOperation.cacheNotify(principal, deque);
+    }
 }
