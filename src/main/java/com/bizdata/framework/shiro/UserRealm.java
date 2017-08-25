@@ -38,10 +38,11 @@ public class UserRealm extends AuthorizingRealm {
     private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
     /**
-     * 返回对应用户所拥有的验证信息
+     * 返回对应用户所拥有的授权信息
      *
-     * @param principals PrincipalCollection
-     * @return AuthorizationInfo
+     * @param principals 账号信息集合
+     * @return 授权信息
+     * @see SimpleAuthorizationInfo
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -57,7 +58,7 @@ public class UserRealm extends AuthorizingRealm {
      * 根据用户名，执行相关的验证操作
      *
      * @param token 验证token
-     * @return AuthenticationInfo
+     * @return 身份验证信息
      * @throws AuthenticationException
      */
     @Override
@@ -66,19 +67,21 @@ public class UserRealm extends AuthorizingRealm {
         String username = (String) token.getPrincipal();
 
         User user = null;
+
         try {
             user = userService.selectUserDetailByUsername(username);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // 用户名不存在
         if (user == null) {
-            throw new UnknownAccountException();// 没找到帐号
+            throw new UnknownAccountException();
         }
 
-        // true:锁定,false:可用,则返回账号锁定
+        // 账号被锁定(true:锁定,false:未锁定)
         if (user.isLocked()) {
-            throw new LockedAccountException(); // 帐号锁定
+            throw new LockedAccountException();
         }
 
         // 交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配

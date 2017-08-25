@@ -1,22 +1,19 @@
 package com.bizdata.admin.controller;
 
 import com.bizdata.admin.controller.vo.LoginParamVO;
-import com.bizdata.admin.domain.LoginLogout;
-import com.bizdata.admin.service.LoginLogoutService;
 import com.bizdata.admin.service.UserService;
 import com.bizdata.commons.constant.LoginLogoutType;
+import com.bizdata.commons.utils.LogInOrOutManager;
 import lombok.extern.slf4j.Slf4j;
 import me.sdevil507.resp.ResultUtil;
 import me.sdevil507.resp.ResultVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.apache.tools.ant.taskdefs.Sleep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,8 +22,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -42,7 +37,7 @@ import java.util.Date;
 public class AdminLoginController {
 
     @Autowired
-    private LoginLogoutService loginLogoutService;
+    private LogInOrOutManager logInOrOutManager;
 
     @Autowired
     private UserService userService;
@@ -129,36 +124,10 @@ public class AdminLoginController {
             String ip = request.getRemoteAddr();// ip
             session.setAttribute("username", username);// session记录username，方便后面超时时进行日志写入
             session.setAttribute("ip", ip);// session记录ip，方便后面超时时进行日志写入
-            loginLogoutService.log(loginFormat(username, ip));
+            logInOrOutManager.log(LoginLogoutType.LOGIN, username, ip);
         } else {
             // 不进行任何操作
         }
-    }
-
-    /**
-     * 登录日志格式
-     *
-     * @param username
-     * @param ip
-     */
-    private LoginLogout loginFormat(String username, String ip) {
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        // 时间
-        Date date = new Date();
-        // 格式化时间
-        String dateString = dateFormat.format(date);
-        // 操作内容
-        String content = username + " 于 " + dateString + " 成功登录后台管理系统 ";
-
-        // 封装对象
-        LoginLogout sysLoginLogout = new LoginLogout();
-        sysLoginLogout.setUsername(username);
-        sysLoginLogout.setContent(content);
-        sysLoginLogout.setDate(date);
-        sysLoginLogout.setType(LoginLogoutType.LOGIN);
-        sysLoginLogout.setIp(ip);
-        return sysLoginLogout;
     }
 
 }
