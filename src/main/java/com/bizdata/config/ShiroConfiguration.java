@@ -6,6 +6,7 @@ import com.bizdata.framework.listener.UserSessionListener;
 import com.bizdata.framework.shiro.RetryLimitHashedCredentialsMatcher;
 import com.bizdata.framework.shiro.UserRealm;
 import com.bizdata.framework.shiro.config.ShiroConfigProperties;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.session.SessionListener;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import javax.servlet.Filter;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -153,7 +155,7 @@ public class ShiroConfiguration {
     public DefaultWebSessionManager getDefaultWebSessionManager() {
         DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
         // 设置全局过期时间
-        defaultWebSessionManager.setGlobalSessionTimeout(shiroConfigProperties().getSession().getTimeOut()*1000);
+        defaultWebSessionManager.setGlobalSessionTimeout(shiroConfigProperties().getSession().getTimeOut() * DateUtils.MILLIS_PER_MINUTE);
         // 会话过期删除会话
         defaultWebSessionManager.setDeleteInvalidSessions(true);
         // 设置sessionDao(可以选择具体session存储方式)
@@ -191,7 +193,7 @@ public class ShiroConfiguration {
         // cookie有助于减少某些类型的跨站点脚本攻击；此特性需要实现了Servlet 2.5 MR6及以上版本的规范的Servlet容器支持；
         simpleCookie.setHttpOnly(true);
         // 设置Cookie的过期时间，秒为单位，默认-1表示关闭浏览器时过期Cookie；
-        simpleCookie.setMaxAge(shiroConfigProperties().getCookie().getMaxAge());
+        simpleCookie.setMaxAge(shiroConfigProperties().getCookie().getMaxAge() * 60);
         return simpleCookie;
     }
 
@@ -229,9 +231,9 @@ public class ShiroConfiguration {
     public SimpleCookie getRememberMeSimpleCookie() {
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
         simpleCookie.setHttpOnly(true);
-        // 设置记住我cookie时间，单位为秒
-        // 30(日)*24(时)*60(分)*60(秒)=2592000
-        simpleCookie.setMaxAge(shiroConfigProperties().getCookie().getRememberMeMaxAge());
+        // 设置记住我cookie时间，单位为分钟
+        // 30(日)*24(时)*60(分)=43200
+        simpleCookie.setMaxAge(shiroConfigProperties().getCookie().getRememberMeMaxAge() * 60);
         return simpleCookie;
     }
 

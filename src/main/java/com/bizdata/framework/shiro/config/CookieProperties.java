@@ -11,12 +11,12 @@ import lombok.Data;
 public class CookieProperties {
 
     /**
-     * cookie过期时间(默认-1不过期,单位为"秒")
+     * cookie过期时间(默认-1不过期,单位为"分钟")
      */
     private int maxAge = -1;
 
     /**
      * 记住我cookie过期时间(默认30天,单位为"秒")
      */
-    private int rememberMeMaxAge = 30 * 24 * 60 * 60;
+    private int rememberMeMaxAge = 30 * 24 * 60;
 }

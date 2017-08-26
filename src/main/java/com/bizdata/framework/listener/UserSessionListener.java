@@ -34,9 +34,11 @@ public class UserSessionListener extends SessionListenerAdapter {
      */
     @Override
     public void onExpiration(Session session) {
-        String username = session.getAttribute("username").toString();
-        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(username);
-        userNameSessionIDsMapOperation.remove(deque, session.getId().toString());
-        userNameSessionIDsMapOperation.cacheNotify(username, deque);
+        String username = (String) session.getAttribute("username");
+        if (null != username) {
+            Deque<Serializable> deque = userNameSessionIDsMapOperation.get(username);
+            userNameSessionIDsMapOperation.remove(deque, session.getId().toString());
+            userNameSessionIDsMapOperation.cacheNotify(username, deque);
+        }
     }
 }

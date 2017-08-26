@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class SessionProperties {
     /**
-     * 默认session超时时间(60分钟,单位:s)
+     * 默认session超时时间(默认30分钟,单位:分钟)
      */
-    private long timeOut = 60 * 60;
+    private long timeOut = 30;
 }
