@@ -157,6 +157,8 @@ public class ShiroConfiguration {
         defaultWebSessionManager.setGlobalSessionTimeout(shiroConfigProperties().getSession().getTimeOut() * DateUtils.MILLIS_PER_MINUTE);
         // 会话过期删除会话
         defaultWebSessionManager.setDeleteInvalidSessions(true);
+        // 定时检查失效的session
+        defaultWebSessionManager.setSessionValidationSchedulerEnabled(true);
         // 设置sessionDao(可以选择具体session存储方式)
         defaultWebSessionManager.setSessionDAO(getEnterpriseCacheSessionDAO());
         // 是否启用/禁用Session Id Cookie，默认是启用的；
