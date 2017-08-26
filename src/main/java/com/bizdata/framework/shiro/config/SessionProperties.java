@@ -13,4 +13,9 @@ public class SessionProperties {
      * 默认session超时时间(默认30分钟,单位:分钟)
      */
     private long timeOut = 30;
+
+    /**
+     * 是否支持集群(默认单机环境[true:集群,false:单机])
+     */
+    private boolean cluster = false;
 }

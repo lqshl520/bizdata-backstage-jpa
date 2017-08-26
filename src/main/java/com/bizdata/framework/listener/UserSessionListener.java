@@ -1,15 +1,10 @@
 package com.bizdata.framework.listener;
 
-import com.bizdata.commons.constant.LoginLogoutType;
-import com.bizdata.commons.utils.LogInOrOutManager;
 import com.bizdata.framework.shiro.utils.UserNameSessionIDsMapOperation;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListenerAdapter;
-import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.security.auth.Subject;
 import java.io.Serializable;
 import java.util.Deque;
 
@@ -24,9 +19,6 @@ public class UserSessionListener extends SessionListenerAdapter {
     @Autowired
     private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
-    @Autowired
-    private LogInOrOutManager logInOrOutManager;
-
     /**
      * 当session超时，进行处理,写入用户为超时退出
      *
@@ -34,6 +26,7 @@ public class UserSessionListener extends SessionListenerAdapter {
      */
     @Override
     public void onExpiration(Session session) {
+        System.out.println("session过期了");
         String username = (String) session.getAttribute("username");
         if (null != username) {
             Deque<Serializable> deque = userNameSessionIDsMapOperation.get(username);

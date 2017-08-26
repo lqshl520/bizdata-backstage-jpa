@@ -3,12 +3,15 @@ package com.bizdata.config;
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.bizdata.framework.filter.KickoutSessionControlFilter;
 import com.bizdata.framework.listener.UserSessionListener;
+import com.bizdata.framework.shiro.RedisCacheSessionDao;
 import com.bizdata.framework.shiro.RetryLimitHashedCredentialsMatcher;
 import com.bizdata.framework.shiro.UserRealm;
 import com.bizdata.framework.shiro.config.ShiroConfigProperties;
+import com.bizdata.framework.shiro.config.ShiroRedisProperties;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
@@ -22,11 +25,16 @@ import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import redis.clients.jedis.JedisPoolConfig;
 
 import javax.servlet.Filter;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -160,7 +168,7 @@ public class ShiroConfiguration {
         // 定时检查失效的session
         defaultWebSessionManager.setSessionValidationSchedulerEnabled(true);
         // 设置sessionDao(可以选择具体session存储方式)
-        defaultWebSessionManager.setSessionDAO(getEnterpriseCacheSessionDAO());
+        defaultWebSessionManager.setSessionDAO(getSessionDao());
         // 是否启用/禁用Session Id Cookie，默认是启用的；
         // 如果禁用后将不会设置Session Id
         // Cookie,即默认使用了Servlet容器的JSESSIONID,且通过URL重写(URL中的“;JSESSIONID=id”部分)保存SessionId
@@ -174,12 +182,74 @@ public class ShiroConfiguration {
         return defaultWebSessionManager;
     }
 
+
+//    @Bean(name = "sessionDAO")
+//    public EnterpriseCacheSessionDAO getSessionDao() {
+//        EnterpriseCacheSessionDAO enterpriseCacheSessionDAO = new EnterpriseCacheSessionDAO();
+//        enterpriseCacheSessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
+//        enterpriseCacheSessionDAO.setSessionIdGenerator(getJavaUuidSessionIdGenerator());
+//        return enterpriseCacheSessionDAO;
+//    }
+
+
+    // ======================================redis参数配置======================================
+    @Bean(name = "shiroRedisProperties")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    public ShiroRedisProperties shiroRedisProperties() {
+        return new ShiroRedisProperties();
+    }
+
+    @Bean(name = "jedisPoolConfig")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    public JedisPoolConfig getJedisPoolConfig() {
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setMaxTotal(shiroRedisProperties().getPool().getMaxActive());
+        jedisPoolConfig.setMaxIdle(shiroRedisProperties().getPool().getMaxIdle());
+        jedisPoolConfig.setMaxWaitMillis(shiroRedisProperties().getPool().getMaxWait());
+        jedisPoolConfig.setMinIdle(shiroRedisProperties().getPool().getMinIdle());
+        return jedisPoolConfig;
+    }
+
+    @Bean(name = "jedisConnectionFactory")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    public JedisConnectionFactory getJedisConnectionFactory() {
+        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+        jedisConnectionFactory.setDatabase(shiroRedisProperties().getDatabase());
+        jedisConnectionFactory.setHostName(shiroRedisProperties().getHost());
+        jedisConnectionFactory.setPort(shiroRedisProperties().getPort());
+        jedisConnectionFactory.setPassword(shiroRedisProperties().getPassword());
+        jedisConnectionFactory.setTimeout(shiroRedisProperties().getTimeout());
+        jedisConnectionFactory.setPoolConfig(getJedisPoolConfig());
+        return jedisConnectionFactory;
+    }
+
+    @Bean(name = "redisTemplate")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    public RedisTemplate<Serializable, Session> getRedisTemplate() {
+        RedisTemplate<Serializable, Session> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(getJedisConnectionFactory());
+        return redisTemplate;
+    }
+
+    /**
+     * 提供sessionDao实现
+     *
+     * @return
+     */
     @Bean(name = "sessionDAO")
-    public EnterpriseCacheSessionDAO getEnterpriseCacheSessionDAO() {
-        EnterpriseCacheSessionDAO enterpriseCacheSessionDAO = new EnterpriseCacheSessionDAO();
-        enterpriseCacheSessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
-        enterpriseCacheSessionDAO.setSessionIdGenerator(getJavaUuidSessionIdGenerator());
-        return enterpriseCacheSessionDAO;
+    public EnterpriseCacheSessionDAO getSessionDao() {
+        EnterpriseCacheSessionDAO sessionDAO;
+        if (shiroConfigProperties().getSession().isCluster()) {
+            //如果是集群环境
+            sessionDAO = new RedisCacheSessionDao();
+            ((RedisCacheSessionDao) sessionDAO).setRedisTemplate(getRedisTemplate());
+        } else {
+            //如果单机环境
+            sessionDAO = new EnterpriseCacheSessionDAO();
+        }
+        sessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
+        sessionDAO.setSessionIdGenerator(getJavaUuidSessionIdGenerator());
+        return sessionDAO;
     }
 
     /**
