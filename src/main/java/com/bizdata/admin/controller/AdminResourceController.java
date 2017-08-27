@@ -51,7 +51,7 @@ public class AdminResourceController {
 	@RequestMapping(value = "/resourceList", method = RequestMethod.GET)
 	@ResponseBody
 	public String resourceList() throws Exception {
-		Map<String, Object> resourceMap = new HashMap<String, Object>();
+		Map<String, Object> resourceMap = new HashMap<>();
 		resourceMap.put("rows", resourceService.findAll());
 		return new Gson().toJson(resourceMap);
 	}
@@ -67,7 +67,7 @@ public class AdminResourceController {
 	@ResponseBody
 	@RequestMapping(value = "/addResource", method = RequestMethod.POST)
 	public String addResource(Resource resource) {
-		String json = "";
+		String json ;
 		try {
 			resourceService.insertResource(resource);
 			json = BizdataResponseStatus.COMMON_SUCCESS.getResult("新增资源成功");
@@ -89,7 +89,7 @@ public class AdminResourceController {
 	@ResponseBody
 	@RequestMapping(value = "/deleteResource", method = RequestMethod.POST)
 	public String deleteResource(String id) {
-		String json = "";
+		String json ;
 		try {
 			resourceService.deleteResource(id);
 			json = BizdataResponseStatus.COMMON_SUCCESS.getResult("删除资源成功");
@@ -111,7 +111,7 @@ public class AdminResourceController {
 	@ResponseBody
 	@RequestMapping(value = "/updateResource", method = RequestMethod.POST)
 	public String updateResource(Resource resource) {
-		String json = "";
+		String json ;
 		try {
 			// 因为jqgrid update操作不传递type，所以从原数据获取
 			Resource old_resource = resourceService.findSysResource(resource.getId());

@@ -78,7 +78,7 @@ public class RoleServiceImpl implements RoleService {
 	 */
 	@Override
 	public Set<String> findPermissions(List<Role> list) {
-		Set<String> resourceSet = new HashSet<String>();
+		Set<String> resourceSet = new HashSet<>();
 		for (Role role : list) {
 			// 根据角色id获取角色对象，并同时将资源信息转换为list
 			role = roleRepository.findOne(role.getId());

@@ -49,12 +49,6 @@ public class User extends JpaUUIDBaseEntity {
     private String password;
 
     /**
-     * 加密密码的盐
-     */
-    @Column(nullable = false)
-    private String salt;
-
-    /**
      * 创建时间
      */
     @Column(nullable = false, updatable = false)

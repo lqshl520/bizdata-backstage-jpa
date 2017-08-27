@@ -3,8 +3,6 @@ package com.bizdata.admin.controller;
 import com.bizdata.admin.domain.LoginLogout;
 import com.bizdata.admin.service.LoginLogoutService;
 import com.bizdata.commons.utils.*;
-import com.bizdata.framework.exception.JpaFindConditionException;
-import me.sdevil507.resp.ResultVO;
 import me.sdevil507.vo.JpaPageParamVO;
 import me.sdevil507.vo.JpaPageResultVO;
 import me.sdevil507.vo.JpaSortParamVO;
@@ -12,7 +10,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -63,7 +60,6 @@ public class AdminLoginLogoutController {
         JpaPageParamVO jpaPageParamVO = jqGridPageVO2JpaPageParamVO.convert(jqGridPageVO);
         JpaSortParamVO jpaSortParamVO = jqGridSortVO2JpaSortParamVO.convert(jqGridSortVO);
         Page<LoginLogout> loginLogouts = loginLogoutService.findAllByPage(jpaPageParamVO, jpaSortParamVO);
-        JpaPageResultVO<LoginLogout, LoginLogout> jpaPageResultVO = new JpaPageResultVO<>(loginLogouts, LoginLogout.class);
-        return jpaPageResultVO;
+        return new JpaPageResultVO<>(loginLogouts, LoginLogout.class);
     }
 }

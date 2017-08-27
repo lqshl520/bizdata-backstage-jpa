@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.bizdata.commons.utils.PasswordHelper;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import com.bizdata.admin.service.UserService;
 import com.bizdata.commons.utils.JpaPageVO;
 import com.bizdata.commons.utils.JpaSortVO;
 import com.bizdata.commons.utils.JqgridSearchVO;
-import com.bizdata.framework.shiro.PasswordHelper;
 import com.bizdata.framework.exception.JpaFindConditionException;
 
 @Service
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String insertUser(User user, String[] role_ids) {
         // 加密密码
-        passwordHelper.encryptPassword(user);
+        user.setPassword(passwordHelper.md5Encrypt(user.getPassword()));
         // 持久化用户角色
         if (role_ids != null && role_ids.length > 0) {
             Set<Role> roles = new HashSet<>();
@@ -69,15 +69,12 @@ public class UserServiceImpl implements UserService {
         String[] ignore;
         if (user.getPassword().length() != 32) {
             // 密码长度不为32时表示为新密码而不是原先md5加密的密码
-            passwordHelper.encryptPassword(user);
+            user.setPassword(passwordHelper.md5Encrypt(user.getPassword()));
             ignore = new String[]{"id", "create_time", "lastLoginTime", "roleList"};
         } else {
             ignore = new String[]{"id", "create_time", "lastLoginTime", "passwordUpdateTime", "roleList"};
         }
         User temp_user = userRepository.findOne(user.getId());
-        if (null == user.getSalt()) {
-            user.setSalt(temp_user.getSalt());
-        }
         BeanUtils.copyProperties(user, temp_user, ignore);
         // 执行用户角色关系修改
         temp_user.getRoleList().clear();
@@ -101,9 +98,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(String userId, String newPassword) {
         User user = userRepository.findOne(userId);
-        user.setPassword(newPassword);
+        user.setPassword(passwordHelper.md5Encrypt(newPassword));
         user.setPasswordUpdateTime(new Date());
-        passwordHelper.encryptPassword(user);
         userRepository.save(user);
     }
 
@@ -161,15 +157,14 @@ public class UserServiceImpl implements UserService {
             return Collections.emptySet();
         }
         // 返回对应的权限
-        Set<String> permissions = roleService.findPermissions(new ArrayList<>(user.getRoleList()));
-        return permissions;
+        return roleService.findPermissions(new ArrayList<>(user.getRoleList()));
     }
 
     @Transactional
     @Override
     public Page<User> findAllByPage(JpaPageVO pageVO, JpaSortVO sortVO, JqgridSearchVO searchVO)
             throws JpaFindConditionException {
-        Page<User> users = null;
+        Page<User> users;
         // if (jpaPageSortWhereCondition.isSearch()) {
         // jpaPageSortWhereCondition.convert();
         // users =
@@ -192,35 +187,22 @@ public class UserServiceImpl implements UserService {
         // 根据用户名找出数据库记录
         User user = userRepository.findUserByUsername(username);
         // 判断旧密码输入是否正确
-        if (passwordHelper.checkPassword(password, user.getPassword(), user.getSalt())) {
-            return true;
-        } else {
-            return false;
-        }
+        return passwordHelper.checkPassword(password, user.getPassword());
     }
 
     @Override
     public void changePassword(String newPassword) {
         // 根据用户名找出数据库记录
         User user = userRepository.findUserByUsername(SecurityUtils.getSubject().getPrincipal().toString());
-        user.setPassword(newPassword);
+        user.setPassword(passwordHelper.md5Encrypt(newPassword));
         user.setPasswordUpdateTime(new Date());
-        passwordHelper.encryptPassword(user);
         userRepository.save(user);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.bizdata.admin.service.UserService#updateLastUpdateTime(java.util.
-     * Date)
-     */
     @Override
     public void updateLastLoginTime(String username, Date date) {
         User user = userRepository.findUserByUsername(username);
         user.setLastLoginTime(date);
         userRepository.save(user);
     }
-
 }

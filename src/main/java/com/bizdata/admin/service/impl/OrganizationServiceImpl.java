@@ -86,7 +86,7 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     private List<Organization> createFormatOrganizationList(List<Organization> list) {
         // 返回的list
-        List<Organization> rootArray = new ArrayList<Organization>();
+        List<Organization> rootArray = new ArrayList<>();
         for (Organization organization : list) {
             if (organization.getParent().equals("0")) {
                 rootArray.add(organization);
@@ -102,7 +102,7 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @return List<Organization>
      */
     private List<Organization> getNextLevelOrganization(Organization currentNode, List<Organization> list) {
-        List<Organization> temp_list = new ArrayList<Organization>();
+        List<Organization> temp_list = new ArrayList<>();
         for (Organization newNode : list) {
             if (newNode.getParent() != null && newNode.getParent().compareTo(currentNode.getId()) == 0) {
                 temp_list.add(newNode);

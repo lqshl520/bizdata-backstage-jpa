@@ -12,13 +12,10 @@ import com.bizdata.framework.exception.PageConditionException;
 import com.bizdata.framework.exception.SearchConditionException;
 import com.bizdata.framework.exception.SortConditionException;
 import com.bizdata.framework.extension.log.Loggable;
-import com.bizdata.framework.shiro.utils.UserNameSessionIDsMapOperation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.Serializable;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,9 +48,6 @@ public class AdminUserController {
 
     @Loggable
     private Logger logger;
-
-    @Autowired
-    private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
     /**
      * 用户信息展示
@@ -134,22 +126,6 @@ public class AdminUserController {
         if (!StringUtils.hasText(user.getUsername()) || !StringUtils.hasText(user.getPassword())) {
             json = BizdataResponseStatus.COMMON_ERROR.getResult("用户信息不完整，请确认后重新提交");
             return json;
-        }
-
-        // 如果被修改的用户是登录着的用户,而且状态设置为禁用,则踢除使用该账号的所有用户
-        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(user.getUsername());
-        for (Serializable sessionID : deque) {
-            if (user.isLocked()) {
-                try {
-                    Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(sessionID));
-                    if (kickoutSession != null) {
-                        // 设置会话的kickout属性表示踢出了
-                        kickoutSession.setAttribute("kickout", true);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         try {

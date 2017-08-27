@@ -1,9 +1,7 @@
 package com.bizdata.admin.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -18,7 +16,6 @@ import com.bizdata.admin.repository.ResourceRepository;
 import com.bizdata.admin.repository.RoleResourceRepository;
 import com.bizdata.admin.service.ResourceService;
 import com.bizdata.commons.constant.ResourceType;
-import com.google.gson.Gson;
 
 @Service
 public class ResourceServiceImpl implements ResourceService {
@@ -115,7 +112,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Transactional
     @Override
-    public List<Resource> findAll(){
+    public List<Resource> findAll() {
         Sort sort = new Sort(Sort.Direction.ASC, "sortNum");
         return createFormatResourceList(resourceRepository.findAll(sort));
     }
@@ -176,7 +173,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public List<Resource> getMenusByPermissions(Set<String> permissions){
+    public List<Resource> getMenusByPermissions(Set<String> permissions) {
         // 获取全部资源
         List<Resource> allResources = findAll();
 

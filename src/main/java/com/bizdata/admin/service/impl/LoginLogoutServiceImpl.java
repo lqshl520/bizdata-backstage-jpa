@@ -9,10 +9,6 @@ import org.springframework.stereotype.Service;
 import com.bizdata.admin.domain.LoginLogout;
 import com.bizdata.admin.repository.LoginLogoutRepository;
 import com.bizdata.admin.service.LoginLogoutService;
-import com.bizdata.commons.utils.JpaPageVO;
-import com.bizdata.commons.utils.JpaSortVO;
-import com.bizdata.commons.utils.JqgridSearchVO;
-import com.bizdata.framework.exception.JpaFindConditionException;
 
 @Service
 public class LoginLogoutServiceImpl implements LoginLogoutService {

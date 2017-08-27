@@ -1,7 +1,5 @@
 package com.bizdata.framework.shiro;
 
-import com.bizdata.framework.shiro.utils.UserNameSessionIDsMapOperation;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -12,14 +10,11 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.bizdata.admin.domain.User;
 import com.bizdata.admin.service.UserService;
 
-import java.io.Serializable;
-import java.util.Deque;
 
 /**
  * 用户认证授权相关，类似dataSource，负责用户账户验证，获取所持有的角色<br>
@@ -33,9 +28,6 @@ public class UserRealm extends AuthorizingRealm {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private UserNameSessionIDsMapOperation userNameSessionIDsMapOperation;
 
     /**
      * 返回对应用户所拥有的授权信息
@@ -84,20 +76,11 @@ public class UserRealm extends AuthorizingRealm {
             throw new LockedAccountException();
         }
 
-        // 交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配
-        String salt = user.getSalt();
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user.getUsername(), // 用户名
+        // 如果身份认证验证成功，返回一个AuthenticationInfo实现；
+        return new SimpleAuthenticationInfo(user.getUsername(), // 用户名
                 user.getPassword(), // 密码
-                ByteSource.Util.bytes(salt), // 此处为盐值，salt=username+salt
                 getName() // realm name
         );
-
-        // 验证成功,设置用户名与session_id的映射
-        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(user.getUsername());
-        userNameSessionIDsMapOperation.add(deque, SecurityUtils.getSubject().getSession().getId().toString());
-        userNameSessionIDsMapOperation.cacheNotify(user.getUsername(), deque);
-        // 如果身份认证验证成功，返回一个AuthenticationInfo实现；
-        return authenticationInfo;
     }
 
     @Override
@@ -128,25 +111,13 @@ public class UserRealm extends AuthorizingRealm {
         clearAllCachedAuthorizationInfo();
     }
 
+    /**
+     * 在退出之前执行的回调
+     *
+     * @param principals
+     */
     @Override
     public void onLogout(PrincipalCollection principals) {
-        //在退出之前回调执行一次清理
-        clearCurrentSessionCache(principals);
         super.onLogout(principals);
-    }
-
-    /**
-     * 退出时清除该用户在映射中的sessionID
-     *
-     * @param principals 身份标识集合
-     */
-    private void clearCurrentSessionCache(PrincipalCollection principals) {
-        // 获取当前sessionID
-        String sessionID = SecurityUtils.getSubject().getSession().getId().toString();
-        // 主身份标识
-        String principal = principals.getPrimaryPrincipal().toString();
-        Deque<Serializable> deque = userNameSessionIDsMapOperation.get(principal);
-        userNameSessionIDsMapOperation.remove(deque, sessionID);
-        userNameSessionIDsMapOperation.cacheNotify(principal, deque);
     }
 }

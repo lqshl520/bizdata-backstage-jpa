@@ -1,8 +1,6 @@
 package com.bizdata.config;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import com.bizdata.framework.filter.KickoutSessionControlFilter;
-import com.bizdata.framework.listener.UserSessionListener;
 import com.bizdata.framework.shiro.RedisCacheSessionDao;
 import com.bizdata.framework.shiro.RetryLimitHashedCredentialsMatcher;
 import com.bizdata.framework.shiro.UserRealm;
@@ -12,7 +10,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -134,6 +131,7 @@ public class ShiroConfiguration {
         return userRealm;
     }
 
+
     /**
      * 拓展凭证匹配器,继承自HashedCredentialsMatcher<br>
      * HashedCredentialsMatcher会根据配置自动识别盐值,加入登录错误次数限制
@@ -145,7 +143,7 @@ public class ShiroConfiguration {
         RetryLimitHashedCredentialsMatcher retryLimitHashedCredentialsMatcher = new RetryLimitHashedCredentialsMatcher(
                 getEhCacheManager());
         retryLimitHashedCredentialsMatcher.setHashAlgorithmName("md5");
-        retryLimitHashedCredentialsMatcher.setHashIterations(2);
+        retryLimitHashedCredentialsMatcher.setHashIterations(1);
         retryLimitHashedCredentialsMatcher.setStoredCredentialsHexEncoded(true);
         return retryLimitHashedCredentialsMatcher;
     }
@@ -175,22 +173,8 @@ public class ShiroConfiguration {
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
         // 设置cookie相关配置
         defaultWebSessionManager.setSessionIdCookie(getSessionIdSimpleCookie());
-        // session监听器链
-        List<SessionListener> listeners = new ArrayList<>();
-        listeners.add(getUserSessionListener());
-        defaultWebSessionManager.setSessionListeners(listeners);
         return defaultWebSessionManager;
     }
-
-
-//    @Bean(name = "sessionDAO")
-//    public EnterpriseCacheSessionDAO getSessionDao() {
-//        EnterpriseCacheSessionDAO enterpriseCacheSessionDAO = new EnterpriseCacheSessionDAO();
-//        enterpriseCacheSessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
-//        enterpriseCacheSessionDAO.setSessionIdGenerator(getJavaUuidSessionIdGenerator());
-//        return enterpriseCacheSessionDAO;
-//    }
-
 
     // ======================================redis参数配置======================================
     @Bean(name = "shiroRedisProperties")
@@ -331,12 +315,11 @@ public class ShiroConfiguration {
         shiroFilterFactoryBean.setLoginUrl("/admin/login");
         Map<String, Filter> filters = new HashMap<>();
         filters.put("ssl", getSslFilter());
-        filters.put("kickout", getKickoutSessionControlFilter());
         shiroFilterFactoryBean.setFilters(filters);
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/admin/logout", "anon");
         filterChainDefinitionMap.put("/admin/ajaxLogin", "anon");
-        filterChainDefinitionMap.put("/admin/**", "kickout,user");
+        filterChainDefinitionMap.put("/admin/**", "user");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;
     }
@@ -351,21 +334,6 @@ public class ShiroConfiguration {
         SslFilter sslFilter = new SslFilter();
         sslFilter.setPort(8443);
         return sslFilter;
-    }
-
-    /**
-     * 同时登陆人数控制 filter
-     *
-     * @return KickoutSessionControlFilter
-     */
-    @Bean(name = "kickoutSessionControlFilter")
-    public KickoutSessionControlFilter getKickoutSessionControlFilter() {
-        KickoutSessionControlFilter kickoutSessionControlFilter = new KickoutSessionControlFilter();
-        kickoutSessionControlFilter.setSessionManager(getDefaultWebSessionManager());
-        kickoutSessionControlFilter.setKickoutAfter(shiroConfigProperties().getKickout().isKickoutAfter());
-        kickoutSessionControlFilter.setMaxSession(shiroConfigProperties().getKickout().getMaxSession());
-        kickoutSessionControlFilter.setKickoutUrl("/admin/login?kickout=true");
-        return kickoutSessionControlFilter;
     }
 
     // ======================================shiro拓展支持======================================
@@ -405,13 +373,4 @@ public class ShiroConfiguration {
         return new ShiroDialect();
     }
 
-    /**
-     * 拓展shiro,用于监听session事件
-     *
-     * @return UserSessionListener
-     */
-    @Bean
-    public UserSessionListener getUserSessionListener() {
-        return new UserSessionListener();
-    }
 }
