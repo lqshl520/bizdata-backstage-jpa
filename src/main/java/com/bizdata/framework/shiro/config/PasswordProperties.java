@@ -14,4 +14,9 @@ public class PasswordProperties {
      * 密码重试次数(默认密码重试5次,则锁定账号)
      */
     private int retryCount = 5;
+
+    /**
+     * 超出密码重试次数，账号锁定时间(单位:min)
+     */
+    private long lockTime = 10;
 }

@@ -15,11 +15,6 @@ import org.springframework.stereotype.Component;
 public class ShiroConfigProperties {
 
     /**
-     * 控制同一账号登陆人数相关配置
-     */
-    private KickoutProperties kickout;
-
-    /**
      * 控制密码相关配置
      */
     private PasswordProperties password;

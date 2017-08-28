@@ -1,11 +1,11 @@
 package com.bizdata.config;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import com.bizdata.framework.shiro.RetryLimitHashedCredentialsMatcher;
 import com.bizdata.framework.shiro.UserRealm;
 import com.bizdata.framework.shiro.config.ShiroConfigProperties;
 import com.bizdata.framework.shiro.config.ShiroRedisProperties;
 import com.bizdata.framework.shiro.redis.RedisCacheSessionDao;
+import com.bizdata.framework.shiro.retry.RetryLimitHashedCredentialsMatcher;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
@@ -48,7 +48,6 @@ import java.util.Map;
 public class ShiroConfiguration {
 
     // ======================================shiro参数配置======================================
-
     @Bean(name = "shiroConfigProperties")
     public ShiroConfigProperties shiroConfigProperties() {
         return new ShiroConfigProperties();
@@ -101,21 +100,6 @@ public class ShiroConfiguration {
         return defaultWebSecurityManager;
     }
 
-//    /**
-//     *多个realm验证处理器,使用setAuthenticator()方法注入到SecurityManager中
-//     *
-//     * @return 多个realm验证处理器
-//     */
-//    @Bean(name = "modularRealmAuthenticator")
-//    public ModularRealmAuthenticator getModularRealmAuthenticator(){
-//        // 多个realm验证处理器
-//        ModularRealmAuthenticator modularRealmAuthenticator=new ModularRealmAuthenticator();
-//        // 此处设置多个realm通过规则,比如全部成功通过,至少一个成功通过等...
-//        AllSuccessfulStrategy  allSuccessfulStrategy=new AllSuccessfulStrategy();
-//        modularRealmAuthenticator.setAuthenticationStrategy(allSuccessfulStrategy);
-//        return modularRealmAuthenticator;
-//    }
-
     // ======================================域配置======================================
 
     /**
@@ -135,7 +119,6 @@ public class ShiroConfiguration {
         return userRealm;
     }
 
-
     /**
      * 拓展凭证匹配器,继承自HashedCredentialsMatcher<br>
      * HashedCredentialsMatcher会根据配置自动识别盐值,加入登录错误次数限制
@@ -144,8 +127,7 @@ public class ShiroConfiguration {
      */
     @Bean(name = "credentialsMatcher")
     public RetryLimitHashedCredentialsMatcher getRetryLimitHashedCredentialsMatcher() {
-        RetryLimitHashedCredentialsMatcher retryLimitHashedCredentialsMatcher = new RetryLimitHashedCredentialsMatcher(
-                getEhCacheManager());
+        RetryLimitHashedCredentialsMatcher retryLimitHashedCredentialsMatcher = new RetryLimitHashedCredentialsMatcher();
         retryLimitHashedCredentialsMatcher.setHashAlgorithmName("md5");
         retryLimitHashedCredentialsMatcher.setHashIterations(1);
         retryLimitHashedCredentialsMatcher.setStoredCredentialsHexEncoded(true);

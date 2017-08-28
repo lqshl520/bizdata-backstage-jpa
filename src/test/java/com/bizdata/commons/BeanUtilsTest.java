@@ -4,6 +4,9 @@ import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.DigestUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BeanUtilsTest {
 
 	@Test
@@ -24,7 +27,8 @@ public class BeanUtilsTest {
 
 	@Test
 	public void test2(){
-		System.out.println(DigestUtils.md5DigestAsHex("Admin123456".getBytes()));
+		Map<String,String> map=new HashMap<>();
+		System.out.println(map.get("sdevil507"));
 	}
 
 }
