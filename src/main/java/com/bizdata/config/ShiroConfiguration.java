@@ -1,15 +1,16 @@
 package com.bizdata.config;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import com.bizdata.framework.shiro.RedisCacheSessionDao;
 import com.bizdata.framework.shiro.RetryLimitHashedCredentialsMatcher;
 import com.bizdata.framework.shiro.UserRealm;
 import com.bizdata.framework.shiro.config.ShiroConfigProperties;
 import com.bizdata.framework.shiro.config.ShiroRedisProperties;
+import com.bizdata.framework.shiro.redis.RedisCacheSessionDao;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -28,11 +29,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.servlet.Filter;
-import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * shiro权限框架配置
@@ -207,11 +211,14 @@ public class ShiroConfiguration {
         return jedisConnectionFactory;
     }
 
-    @Bean(name = "redisTemplate")
+    @Bean(name = "redisTemplateForSessionDao")
     @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
-    public RedisTemplate<Serializable, Session> getRedisTemplate() {
-        RedisTemplate<Serializable, Session> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Session> getRedisTemplateForSessionDao() {
+        RedisTemplate<String, Session> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(getJedisConnectionFactory());
+        RedisSerializer stringSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
         return redisTemplate;
     }
 
@@ -221,17 +228,16 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean(name = "sessionDAO")
-    public EnterpriseCacheSessionDAO getSessionDao() {
-        EnterpriseCacheSessionDAO sessionDAO;
+    public AbstractSessionDAO getSessionDao() {
+        AbstractSessionDAO sessionDAO;
         if (shiroConfigProperties().getSession().isCluster()) {
             //如果是集群环境
-            sessionDAO = new RedisCacheSessionDao();
-            ((RedisCacheSessionDao) sessionDAO).setRedisTemplate(getRedisTemplate());
+            sessionDAO = new RedisCacheSessionDao(shiroConfigProperties().getSession().getTimeOut());
+            ((RedisCacheSessionDao) sessionDAO).setRedisTemplate(getRedisTemplateForSessionDao());
         } else {
             //如果单机环境
             sessionDAO = new EnterpriseCacheSessionDAO();
         }
-        sessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
         sessionDAO.setSessionIdGenerator(getJavaUuidSessionIdGenerator());
         return sessionDAO;
     }

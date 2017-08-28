@@ -2,9 +2,12 @@ package com.bizdata.admin.controller;
 
 import com.bizdata.admin.domain.Resource;
 import com.bizdata.admin.service.MenuService;
+import com.bizdata.framework.shiro.redis.RedisCacheSessionDao;
 import me.sdevil507.resp.ResultUtil;
 import me.sdevil507.resp.ResultVO;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 首页Controller

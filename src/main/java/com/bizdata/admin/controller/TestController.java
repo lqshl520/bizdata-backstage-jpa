@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.Serializable;
+
 /**
  * 测试
  * <p>
@@ -14,12 +16,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class TestController {
 
+    private String keyPrefix = "shiro_session:";
+
+    private String getKey(Serializable sessionId) {
+        return keyPrefix + sessionId;
+    }
+
     @Autowired
     private RedisTemplate<String,String > redisTemplate;
 
     @RequestMapping(value = "/test")
     @ResponseBody
     public void test() {
-        redisTemplate.opsForValue().set("username","sdevil507");
+        redisTemplate.opsForValue().set(getKey("username"),"sdevil507");
     }
 }
