@@ -10,7 +10,7 @@ import java.util.List;
  * <p>
  * Created by sdevil507 on 2017/8/26.
  */
-@ConfigurationProperties(prefix = "shiro.session.redis")
+@ConfigurationProperties(prefix = "shiro.redis")
 public class ShiroRedisProperties {
     /**
      * Database index used by the connection factory.

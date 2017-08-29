@@ -164,13 +164,13 @@ public class ShiroConfiguration {
 
     // ======================================redis参数配置======================================
     @Bean(name = "shiroRedisProperties")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
     public ShiroRedisProperties shiroRedisProperties() {
         return new ShiroRedisProperties();
     }
 
     @Bean(name = "jedisPoolConfig")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
     public JedisPoolConfig getJedisPoolConfig() {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxTotal(shiroRedisProperties().getPool().getMaxActive());
@@ -181,7 +181,7 @@ public class ShiroConfiguration {
     }
 
     @Bean(name = "jedisConnectionFactory")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
     public JedisConnectionFactory getJedisConnectionFactory() {
         JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
         jedisConnectionFactory.setDatabase(shiroRedisProperties().getDatabase());
@@ -193,8 +193,29 @@ public class ShiroConfiguration {
         return jedisConnectionFactory;
     }
 
+    /**
+     * 用于集群环境下密码错误重试次数RedisTemplate
+     *
+     * @return RedisTemplate
+     */
+    @Bean(name = "redisTemplateForPwdRetry")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
+    public RedisTemplate<String, Integer> getRedisTemplateForPwdRetry() {
+        RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(getJedisConnectionFactory());
+        RedisSerializer stringSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
+        return redisTemplate;
+    }
+
+    /**
+     * 用于集群环境下SessionDao的RedisTemplate
+     *
+     * @return RedisTemplate
+     */
     @Bean(name = "redisTemplateForSessionDao")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", havingValue = "true")
+    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
     public RedisTemplate<String, Session> getRedisTemplateForSessionDao() {
         RedisTemplate<String, Session> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(getJedisConnectionFactory());
@@ -212,7 +233,7 @@ public class ShiroConfiguration {
     @Bean(name = "sessionDAO")
     public AbstractSessionDAO getSessionDao() {
         AbstractSessionDAO sessionDAO;
-        if (shiroConfigProperties().getSession().isCluster()) {
+        if (shiroConfigProperties().isCluster()) {
             //如果是集群环境
             sessionDAO = new RedisCacheSessionDao(shiroConfigProperties().getSession().getTimeOut());
             ((RedisCacheSessionDao) sessionDAO).setRedisTemplate(getRedisTemplateForSessionDao());

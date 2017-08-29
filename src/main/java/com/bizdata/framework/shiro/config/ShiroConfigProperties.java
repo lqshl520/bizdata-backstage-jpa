@@ -2,6 +2,8 @@ package com.bizdata.framework.shiro.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,6 +15,11 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "shiro")
 @Data
 public class ShiroConfigProperties {
+
+    /**
+     * 是否支持集群(默认单机环境[true:集群,false:单机])
+     */
+    private boolean cluster = false;
 
     /**
      * 控制密码相关配置

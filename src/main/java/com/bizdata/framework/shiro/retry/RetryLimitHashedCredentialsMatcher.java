@@ -7,6 +7,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.PostConstruct;
 
@@ -23,13 +24,16 @@ public class RetryLimitHashedCredentialsMatcher extends HashedCredentialsMatcher
     @Autowired
     private ShiroConfigProperties shiroConfigProperties;
 
+    @Autowired(required = false)
+    private RedisTemplate<String, Integer> redisTemplate;
+
     @PostConstruct
     public void init() {
         int limitCount = shiroConfigProperties.getPassword().getRetryCount();
         long lockTime = shiroConfigProperties.getPassword().getLockTime();
-        if (shiroConfigProperties.getSession().isCluster()) {
+        if (shiroConfigProperties.isCluster()) {
             // 如果是集群环境,则使用redis记录用户密码输入错误次数
-            // TODO redis实现方式
+            this.absPasswordRetryLimitOperation = new RedisPasswordRetryLimitOperation(limitCount, lockTime, redisTemplate);
         } else {
             // 如果是单机环境,则使用内存保存用户密码输入错误次数
             this.absPasswordRetryLimitOperation = new MemoryPasswordRetryLimitOperation(limitCount, lockTime);

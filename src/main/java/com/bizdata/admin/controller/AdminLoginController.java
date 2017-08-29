@@ -4,6 +4,7 @@ import com.bizdata.admin.controller.vo.LoginParamVO;
 import com.bizdata.admin.service.UserService;
 import com.bizdata.commons.constant.LoginLogoutType;
 import com.bizdata.commons.utils.LogInOrOutManager;
+import com.bizdata.framework.shiro.config.ShiroConfigProperties;
 import lombok.extern.slf4j.Slf4j;
 import me.sdevil507.resp.ResultUtil;
 import me.sdevil507.resp.ResultVO;
@@ -40,6 +41,9 @@ public class AdminLoginController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ShiroConfigProperties shiroConfigProperties;
 
     /**
      * 展示登录页面
@@ -80,7 +84,7 @@ public class AdminLoginController {
             } else if ("LockedAccountException".equals(message)) {
                 result = "账号被锁定!";
             } else if ("ExcessiveAttemptsException".equals(message)) {
-                result = "输入错误次数太多,该账号被锁定10分钟!";
+                result = "密码错误输入已达" + shiroConfigProperties.getPassword().getRetryCount() + "次,该账号被锁定" + shiroConfigProperties.getPassword().getLockTime() + "分钟!";
             } else if (StringUtils.isNotEmpty(message)) {
                 result = "未知错误,请联系平台管理员!";
             }

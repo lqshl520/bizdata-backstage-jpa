@@ -33,7 +33,7 @@ public abstract class AbsPasswordRetryLimitOperation {
      */
     public boolean overLimit(String username) {
         int currentCount = getCurrentCount(username);
-        return currentCount > limitCount;
+        return currentCount >= limitCount;
     }
 
     /**
