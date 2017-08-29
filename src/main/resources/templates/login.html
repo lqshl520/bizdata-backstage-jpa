@@ -22,7 +22,8 @@
                         <h2 class="login-box-header">{{title}}</h2>
                     </Form-item>
                     <Form-item prop="username">
-                        <i-input size="large" type="text" v-model="domain.username" placeholder="Username">
+                        <i-input ref="username" size="large" type="text" v-model="domain.username" autofocus="true"
+                                 placeholder="Username">
                                 <span slot="prepend">
                                         &nbsp;<Icon size="22" type="ios-person"></Icon>&nbsp;
                                 </span>
@@ -107,6 +108,8 @@
                                 // 重置表单
                                 vm.domain.username = '';
                                 vm.domain.password = '';
+                                // 设置username获取焦点
+                                vm.$refs['username'].focus();
                             } else {
                                 // 登录成功,执行跳转至主页
                                 location.href = "/admin/"
