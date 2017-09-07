@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
     <!--定义日志文件的存储地址,LogBack的配置中必须使用绝对路径,否则会报错-->
-    <property name="LOG_HOME" value="/Users/sdevil507/Java/workspace/bizdata-backstage-jpa/target/logs" />
+    <!-- 默认哪里启动该命令,在哪里生成logs -->
+    <property name="LOG_HOME" value="${user.dir}/logs" />
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
