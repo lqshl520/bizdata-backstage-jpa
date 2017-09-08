@@ -87,7 +87,8 @@
                     if (valid) {
                         // 载入loading动画
                         vm.loading = true;
-                        axios.post('/admin/ajaxLogin', {
+                        var target = /*[[@{/admin/ajaxLogin}]]*/ 'ajax登录'
+                        axios.post(target, {
                                 username: vm.domain.username,
                                 password: vm.domain.password,
                                 rememberMe: vm.rememberMe
@@ -112,7 +113,8 @@
                                 vm.$refs['username'].focus();
                             } else {
                                 // 登录成功,执行跳转至主页
-                                location.href = "/admin/"
+                                var target = /*[[@{/admin/}]]*/ '跳转至/contextPath/admin'
+                                location.href = target
                             }
                         })
                     }
