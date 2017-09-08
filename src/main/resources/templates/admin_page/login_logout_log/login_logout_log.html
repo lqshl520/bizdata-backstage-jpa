@@ -23,11 +23,15 @@
 <!-- /.row -->
 
 <!-- inline scripts related to this page -->
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
     /*<![CDATA[*/
     var scripts = [
-        null, "/assets/js/jqGrid/jquery.jqGrid.src.js", "/assets/js/jqGrid/i18n/grid.locale-cn.js", null
+        null,
+        /*[[@{/assets/js/jqGrid/jquery.jqGrid.src.js}]]*/ '',
+        /*[[@{/assets/js/jqGrid/i18n/grid.locale-cn.js}]]*/ '',
+        null
     ]
+
     $('.page-content-area').ace_ajax('loadScripts', scripts, function () {
         /* 选择器 */
         var grid_selector = "#grid-table";
