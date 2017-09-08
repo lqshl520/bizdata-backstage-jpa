@@ -32,23 +32,9 @@
     <link rel="stylesheet" th:href="@{/assets/css/ace.css}"
           class="ace-main-stylesheet" id="main-ace-style"/>
 
-    <!--[if lte IE 9]>
-    <link rel="stylesheet" href="${ctx }assets/css/ace-part2.css" class="ace-main-stylesheet"/>
-    <![endif]-->
-
-    <!--[if lte IE 9]>
-    <link rel="stylesheet" href="${ctx }assets/css/ace-ie.css"/>
-    <![endif]-->
-
     <!-- ace settings handler -->
     <script th:src="@{/assets/js/ace-extra.js}"></script>
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-
-    <!--[if lte IE 8]>
-    <script src="${ctx }assets/js/html5shiv.js"></script>
-    <script src="${ctx }assets/js/respond.js"></script>
-    <![endif]-->
 </head>
 <body class="no-skin">
 
@@ -366,30 +352,7 @@
 </div>
 
 <!-- basic scripts -->
-
-<!--[if !IE]> -->
-<script type="text/javascript">
-    /*<![CDATA[*/
-    window.jQuery
-    || document.write("<script src='../assets/js/jquery.js'>"
-        + "<" + "/script>");
-    /*]]>*/
-</script>
-<!-- <![endif]-->
-
-<!--[if IE]>
-<script type="text/javascript">
-    window.jQuery || document.write("<script src='${ctx }assets/js/jquery1x.js'>" + "<" + "/script>");
-</script>
-<![endif]-->
-<script type="text/javascript">
-    /*<![CDATA[*/
-    if ('ontouchstart' in document.documentElement)
-        document.write("<script th:src='@{assets/js/jquery.mobile.custom.js}'>"
-            + "<" + "/script>");
-    /*]]>*/
-</script>
-
+<script th:src="@{/assets/js/jquery.js}"></script>
 <script th:src="@{/assets/js/bootstrap.js}"></script>
 <script th:src="@{/assets/js/jquery-ui.js}"></script>
 
@@ -397,13 +360,14 @@
 <script th:src="@{/assets/js/jquery.validate.js}"></script>
 <script th:src="@{/assets/js/additional-methods.js}"></script>
 <!-- sdevil507 2015-12-20 add 根据后台返回的全局量，401值进行页面的跳转，此处用于超时跳转到登录页 -->
-<script>
+<script type="text/javascript" th:inline="javascript">
     /*<![CDATA[*/
     $.ajaxSetup({
         complete: function (XMLHttpRequest, textStatus) {
             if ("401" == XMLHttpRequest.status) {
                 alert("你已被系统强制退出!原因可能如下:\n\n1.登录超过\n2.你的账号在别处登录\n3.账户已被管理员禁用");
-                window.location.href = "/admin";
+                var target = /*[[@{/admin}]]*/ ''
+                window.location.href = target;
             }
         }
     });
@@ -414,7 +378,8 @@
         if (!state) {
             return false
         } else {
-            window.location.href = "/admin/logout"
+            var target = /*[[@{/admin/logout}]]*/ ''
+            window.location.href = target
         }
     });
 
@@ -455,7 +420,7 @@
                                     var valid = $('#validation-form').valid();
                                     if (valid) {
                                         //提交密码进行更新
-                                        $.post("/admin/user/changePassword", {
+                                        $.post(/*[[@{/admin/user/changePassword}]]*/ '', {
                                             password: $('#new_password').val()
                                         }, function (result) {
                                             $('#dialog-change-password').dialog("close");
@@ -479,7 +444,7 @@
                 old_password: {
                     required: true,
                     remote: {
-                        url: "/admin/user/checkPassword",
+                        url: /*[[@{/admin/user/checkPassword}]]*/ '',
                         type: "GET",
                         dataType: "json",
                         data: {
