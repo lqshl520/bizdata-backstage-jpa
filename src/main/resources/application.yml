@@ -21,7 +21,7 @@ spring:
     
   jpa: #jpa config
     database: MYSQL
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
@@ -36,7 +36,7 @@ spring:
     cache: false
 
 shiro:
-  cluster: false #是否是集群模式(true:[当前使用redis实现,需要配置redis参数],false:[使用ehcache,配置ehcache-shiro.xml文件])
+  cluster: true #是否是集群模式(true:[当前使用redis实现,需要配置redis参数],false:[使用ehcache,配置ehcache-shiro.xml文件])
 
   redis: #集群环境下redis配置
     database: 0 # Redis数据库索引（默认为0)
