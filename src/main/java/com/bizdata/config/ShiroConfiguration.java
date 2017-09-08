@@ -164,13 +164,13 @@ public class ShiroConfiguration {
 
     // ======================================redis参数配置======================================
     @Bean(name = "shiroRedisProperties")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "shiro", name = "cluster", matchIfMissing = true)
     public ShiroRedisProperties shiroRedisProperties() {
         return new ShiroRedisProperties();
     }
 
     @Bean(name = "jedisPoolConfig")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "shiro", name = "cluster", matchIfMissing = true)
     public JedisPoolConfig getJedisPoolConfig() {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxTotal(shiroRedisProperties().getPool().getMaxActive());
@@ -181,7 +181,7 @@ public class ShiroConfiguration {
     }
 
     @Bean(name = "jedisConnectionFactory")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "shiro", name = "cluster", matchIfMissing = true)
     public JedisConnectionFactory getJedisConnectionFactory() {
         JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
         jedisConnectionFactory.setDatabase(shiroRedisProperties().getDatabase());
@@ -199,7 +199,7 @@ public class ShiroConfiguration {
      * @return RedisTemplate
      */
     @Bean(name = "redisTemplateForPwdRetry")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "shiro", name = "cluster", matchIfMissing = true)
     public RedisTemplate<String, Integer> getRedisTemplateForPwdRetry() {
         RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(getJedisConnectionFactory());
@@ -215,7 +215,7 @@ public class ShiroConfiguration {
      * @return RedisTemplate
      */
     @Bean(name = "redisTemplateForSessionDao")
-    @ConditionalOnProperty(prefix = "shiro.session", name = "cluster", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "shiro", name = "cluster", matchIfMissing = true)
     public RedisTemplate<String, Session> getRedisTemplateForSessionDao() {
         RedisTemplate<String, Session> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(getJedisConnectionFactory());

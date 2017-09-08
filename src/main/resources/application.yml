@@ -2,6 +2,9 @@ server: #server config
   port: 8080
 
 spring:
+  application:
+    name: backstage
+
   main: #spring boot config
     banner-mode: "off" #关闭banner
 
