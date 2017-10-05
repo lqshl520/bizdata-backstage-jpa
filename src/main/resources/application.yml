@@ -1,7 +1,9 @@
-server: #server config
-  port: 8080
-
+---
+# 共用配置
 spring:
+  profiles:
+    active: dev
+
   application:
     name: backstage
 
@@ -12,27 +14,83 @@ spring:
     dateFormat: yyyy-MM-dd HH:mm:ss
     timeZone: GMT+8
 
+  messages: #i18n config
+    basename: i18n/messages
+
+  thymeleaf: #thymeleaf config
+    mode: HTML5
+    encoding: UTF-8
+    content-type: text/html
+    cache: false
+
+---
+# 开发环境配置
+server:
+  port: 8080
+
+spring:
+  profiles: dev
+
   datasource: #data source config
-    url: jdbc:mysql://127.0.0.1:3306/gjf?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
     password: 123456
     driverClassName: com.mysql.jdbc.Driver
     initScriptFile: /sql/init.sql
-    
+
   jpa: #jpa config
     database: MYSQL
     show-sql: false
     hibernate:
       ddl-auto: update
 
-  messages: #i18n config
-    basename: i18n/messages
-   
-  thymeleaf: #thymeleaf config
-    mode: HTML5
-    encoding: UTF-8
-    content-type: text/html
-    cache: false
+shiro:
+  cluster: false #是否是集群模式(true:[当前使用redis实现,需要配置redis参数],false:[使用ehcache,配置ehcache-shiro.xml文件])
+
+  redis: #集群环境下redis配置
+    database: 0 # Redis数据库索引（默认为0)
+    host: 127.0.0.1
+    port: 6379
+    password:
+    timeout: 0
+    pool:
+      maxActive: 8
+      maxWait: -1
+      maxIdle: 8
+      minIdle: 0
+
+  password: #控制密码相关配置
+    retryCount: 5 #密码最多输入错误数
+    lockTime: 10 #超出密码最大错误次数,锁定时间(单位:min)
+
+  cookie: #控制cookie相关配置
+    maxAge: -1 #过期时间(-1:永不过期,单位:分钟)
+    rememberMeMaxAge: 43200 #记住我cookie过期时间(默认30天,单位为"分钟")
+
+  session: #控制session相关配置
+    timeOut: 30 #session超时时间(单位:分钟)
+
+
+---
+# 生产环境配置
+server:
+  port: 9090
+
+spring:
+  profiles: pro
+
+  datasource: #data source config
+    url: jdbc:mysql://127.0.0.1:3306/gjf?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 123456
+    driverClassName: com.mysql.jdbc.Driver
+    initScriptFile: /sql/init.sql
+
+  jpa: #jpa config
+    database: MYSQL
+    show-sql: false
+    hibernate:
+      ddl-auto: update
 
 shiro:
   cluster: false #是否是集群模式(true:[当前使用redis实现,需要配置redis参数],false:[使用ehcache,配置ehcache-shiro.xml文件])
